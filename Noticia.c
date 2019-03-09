@@ -23,13 +23,12 @@ void addTxt(Noticia x, char *txt);
 void addCategory(Noticia x, char *category);
 void printAll(Noticia x);
 
+
+
+
+//Implementação
 Noticia initNoticia(){
     Noticia n = malloc(sizeof(struct noticia));
-    n->id = malloc(1024);
-    n->title = malloc(1204);
-    n->date = malloc(1204);
-    n->text = malloc(1204);
-    n->category = malloc(1204);
     n->tags = malloc(sizeof(char*)*1024);
     n->lenght_tags=0;
 
@@ -37,42 +36,39 @@ Noticia initNoticia(){
 }
 
 void addId(Noticia x,char *t){
-    strcpy(x->id,t);
+    x->id = strdup(t);
 }
 
 void addTitle(Noticia x,char *t){
-    strcpy(x->title,t);
+    x->title = strdup(t);
 }
 
 void addDate(Noticia x,char *t){
-    strcpy(x->date,t);
+    x->date = strdup(t);
 }
 
 void addTxt(Noticia x,char *t){
-    strcpy(x->text,t);
+    x->text = strdup(t);
 }
 
 void addCategory(Noticia x,char *t){
-    strcpy(x->category,t);
+    x->category = strdup(t);
 }
 
 
 void addTag(Noticia x,char *t){
-    x->tags[x->lenght_tags] = malloc(1024);
-    strcpy(x->tags[x->lenght_tags],t);
-    x->lenght_tags++;
+    x->tags[x->lenght_tags++] = strdup(t);
 }
 
-//incompleto
 void printAll(Noticia x){
     //imprime id
     printf("%s\n",x->id);
     //imprime titulo
     printf("%s\n",x->title);
     //imprime tags
-    while(x->lenght_tags-1>=0){
-        printf("%s\n",x->tags[x->lenght_tags-1]);
-        x->lenght_tags--;
+    int i = 0;
+    while(i<x->lenght_tags){
+        printf("%s\n",x->tags[i++]);
     }
     //imprime data
      printf("%s\n",x->date);
