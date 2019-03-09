@@ -6,8 +6,10 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glib.h>
 #include "Noticia.h"
 
+GTree *noticias;
 Noticia x;
 
 %}
@@ -43,15 +45,29 @@ int yywrap(){
     return 1;
 }
 
+gint compareIds (gconstpointer name1, gconstpointer name2)
+{
+    printf("strcmp: %d\n", strcmp (name1, name2));
+    return (strcmp (name1 , name2));
+}
+
 int main(int argc, char *argv[]){
     
-
+    noticias = g_tree_new((GCompareFunc) compareIds);
     Noticia x = initNoticia();
-    addId(x,"dasdasdsa");
+    char* id = "dasdasdsa";
+    addId(x,id);
     addTag(x,"coisas");
     addTag(x,"ola");
+    g_tree_insert(noticias, id, x);
+    gpointer ptr = g_tree_lookup(noticias, (gconstpointer) id);
+    Noticia n = (Noticia) ptr;
 
+    printf("%d\n", (int) g_tree_nnodes (noticias) );
+    printf("Noticia x:");
     printAll(x);
+    printf("Noticia n:");
+    printAll(n);
 
     printf("Inicio da filtragem\n");
 
