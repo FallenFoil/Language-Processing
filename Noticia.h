@@ -9,13 +9,14 @@
 typedef struct noticia *Noticia;
 
 
-Noticia initNoticia();
-void addId(Noticia x, char *Id);
-void addTitle(Noticia x, char *title);
-void addDate(Noticia x, char *date);
-void addTag(Noticia x,char *tag);
-void addTxt(Noticia x, char *txt);
-void addCategory(Noticia x, char *category);
-void printAll(Noticia x);
+Noticia initNoticia();//inicializa a noticia
+void addId(Noticia x, char *Id);//adiciona um id á noticia
+void addTitle(Noticia x, char *title);//adiciona um titulo á noticia
+void addDate(Noticia x, char *date);//adiciona uma data á noticia
+void addTag(Noticia x,char *tag);//adiciona uma tag á noticia
+void addTxt(Noticia x, char *txt);//adiciona o texto á noticia
+void addCategory(Noticia x, char *category);//adiciona uma categoria á noticia
+void printAll(Noticia x);//imprime toda a informação de uma determinada noticia
+char* getId(Noticia x);//devolve o id de uma noticia
 
 #endif

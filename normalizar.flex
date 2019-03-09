@@ -9,6 +9,10 @@
 #include <glib.h>
 #include "Noticia.h"
 
+#define MB 1024
+
+char txt[1024*MB] ;
+
 GTree *noticias;
 Noticia x;
 
@@ -25,33 +29,34 @@ Noticia x;
 %%
 
 
-\<pub\> {ECHO; x = initNoticia(); BEGIN ARTIGO;}
+\<pub\> {ECHO; x = initNoticia(); BEGIN ARTIGO;}//começo de uma nova noticia
 
-<ARTIGO>\</pub\> {ECHO; BEGIN INITIAL;}
-<ARTIGO>\n{3,} {printf("\n\n");}//tira todas as linhas em branco desnecessárias
+<ARTIGO>"</pub>" {ECHO; g_tree_insert(noticias, getId(x) , x); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
 <ARTIGO>(.|\n) {ECHO;}//imprime tudo o resto
-<ARTIGO>#TAG: {ECHO; BEGIN TAG;}
-<ARTIGO>#DATE: {ECHO; BEGIN DATE;}
+<ARTIGO>#TAG: {ECHO; BEGIN TAG;}//encontra tag
+<ARTIGO>#DATE: {ECHO; BEGIN DATE;}//encontra data
 
-<TAG>tag:\{[A-Z a-z]* {ECHO;addTag(x,yytext+5);}
-<TAG>#ID: {ECHO; BEGIN ID;}
+<TAG>tag:\{[A-Z\ a-z]* {ECHO;addTag(x,yytext+5);}//todas as tags
+<TAG>#ID: {ECHO; BEGIN ID;}//encontra id
 
 <ID>post-[0-9]+ {ECHO;addId(x,yytext);}
 <ID>\n {ECHO;BEGIN CATEGORY;}
-
 
 <CATEGORY>.* {ECHO; addCategory(x,yytext);}
 <CATEGORY>\n\n {ECHO; BEGIN TITLE;}
 
 <TITLE>.* {ECHO; addTitle(x,yytext);BEGIN ARTIGO;}
 
+<DATE>.*\n\n {ECHO; BEGIN TEXT;}
+<DATE>.* {ECHO; addDate(x,yytext+9);}
 
-<DATE>.* {ECHO; addDate(x,yytext+8);}
-<DATE>\n\n {ECHO;printf("TEXTO\n");BEGIN TEXT;}
 
-<TEXT>\$ {ECHO;printf("1 found\n");}
 
-<TEXT>\n{3,} {printf("\n\n");BEGIN ARTIGO;}
+<TEXT>.*\n {ECHO; strcat(txt,yytext);}//texto está todo na variavel txt
+<TEXT>\n{3,} {addTxt(x,txt); strcpy(txt,""); printf("\n\n"); BEGIN ARTIGO;}//adiciona o texto, recomeça o txt e volta para o artigo
+
+
+
 
 
 (.*) {;}//tudo o que não tiver entre pub é removido
@@ -69,30 +74,27 @@ gint compareIds (gconstpointer name1, gconstpointer name2)
     return (strcmp (name1 , name2));
 }
 
+gboolean transverseFunc(void * key, void * value, void * data){
+
+    Noticia x = (Noticia) value;
+    printAll(x);
+
+}
+
+
 int main(int argc, char *argv[]){
     
+
     noticias = g_tree_new((GCompareFunc) compareIds);
-    Noticia x = initNoticia();
-    char* id = "dasdasdsa";
-    addId(x,id);
-    addTag(x,"coisas");
-    addTag(x,"ola");
-    g_tree_insert(noticias, id, x);
-    gpointer ptr = g_tree_lookup(noticias, (gconstpointer) id);
-    Noticia n = (Noticia) ptr;
 
     printf("%d\n", (int) g_tree_nnodes (noticias) );
-    printf("Noticia x:");
-    printAll(x);
-    printf("Noticia n:");
-    printAll(n);
-
     printf("Inicio da filtragem\n");
 
     yylex(); //invocar a função de conhecimento que ele vai gerar para janeiro e os outros
 
     printf("Fim da filtragem\n");
 
+    g_tree_foreach(noticias, transverseFunc , NULL);
     
     return 0;
 }
