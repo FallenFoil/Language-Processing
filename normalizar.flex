@@ -16,23 +16,43 @@ Noticia x;
 %x TAG
 %x DATE
 %x ID
+%x CATEGORY
+%x TITLE
+%x TEXT
 
 %%
 
 
-"<pub>" {ECHO; x = initNoticia(); BEGIN ARTIGO;}
+\<pub\> {ECHO; x = initNoticia(); BEGIN ARTIGO;}
 
-<ARTIGO>"</pub>" {ECHO; BEGIN INITIAL;}
+<ARTIGO>\</pub\> {ECHO; BEGIN INITIAL;}
 <ARTIGO>\n{3,} {printf("\n\n");}//tira todas as linhas em branco desnecessárias
-<ARTIGO>(.|\n) {ECHO;}
-<ARTIGO>"#TAG:" {ECHO; BEGIN TAG;}
+<ARTIGO>(.|\n) {ECHO;}//imprime tudo o resto
+<ARTIGO>#TAG: {ECHO; BEGIN TAG;}
+<ARTIGO>#DATE: {ECHO; BEGIN DATE;}
+
+<TAG>tag:\{[A-Z a-z]* {ECHO;addTag(x,yytext+5);}
+<TAG>#ID: {ECHO; BEGIN ID;}
+
+<ID>post-[0-9]+ {ECHO;addId(x,yytext);}
+<ID>\n {ECHO;BEGIN CATEGORY;}
 
 
-<TAG>"tag:{"[A-Z a-z]*\} {ECHO;addTag(x,yytext+5);}
+<CATEGORY>.* {ECHO; addCategory(x,yytext);}
+<CATEGORY>\n\n {ECHO; BEGIN TITLE;}
+
+<TITLE>.* {ECHO; addTitle(x,yytext);BEGIN ARTIGO;}
+
+
+<DATE>.* {ECHO; addDate(x,yytext+8);}
+<DATE>\n\n {ECHO;printf("TEXTO\n");BEGIN TEXT;}
+
+<TEXT>\^$ {ECHO;printf("1 found\n");}
+<TEXT>(.*)\n\n {ECHO;printf("2 found\n");}
+<TEXT>\n{3,} {BEGIN ARTIGO;}
 
 
 
-"#ID:" {ECHO;BEGIN ID;}
 
 (.*) {;}//tudo o que não tiver entre pub é removido
 (\n{3,}) {printf("\n\n");}//linhas em branco extra são removidas
@@ -46,16 +66,9 @@ int yywrap(){
 int main(int argc, char *argv[]){
     
 
-    Noticia x = initNoticia();
-    addId(x,"dasdasdsa");
-    addTag(x,"coisas");
-    addTag(x,"ola");
-
-    printAll(x);
-
     printf("Inicio da filtragem\n");
 
-    //yylex(); //invocar a função de conhecimento que ele vai gerar para janeiro e os outros
+    yylex(); //invocar a função de conhecimento que ele vai gerar para janeiro e os outros
 
     printf("Fim da filtragem\n");
 
