@@ -47,11 +47,9 @@ Noticia x;
 <DATE>.* {ECHO; addDate(x,yytext+8);}
 <DATE>\n\n {ECHO;printf("TEXTO\n");BEGIN TEXT;}
 
-<TEXT>\^$ {ECHO;printf("1 found\n");}
-<TEXT>(.*)\n\n {ECHO;printf("2 found\n");}
-<TEXT>\n{3,} {BEGIN ARTIGO;}
+<TEXT>\$ {ECHO;printf("1 found\n");}
 
-
+<TEXT>\n{3,} {printf("\n\n");BEGIN ARTIGO;}
 
 
 (.*) {;}//tudo o que não tiver entre pub é removido
