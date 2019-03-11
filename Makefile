@@ -20,6 +20,6 @@ normalizar.c: normalizar.flex
 
 
 clean: 
-	$(RM) *.o *~
+	$(RM) *.o
 	$(RM) normalizar.c
 	$(RM) program
