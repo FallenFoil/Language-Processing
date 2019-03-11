@@ -15,14 +15,25 @@ typedef struct noticia{
 
 }* Noticia;
 
+typedef struct tag{   
+    char *tag;//tag
+    int rept;//contador
+}* Tag;
+
 //Funções públicas
+Noticia initNoticia();
+Tag initTag(char *name);
 void addTitle(Noticia x, char *title);
 void addDate(Noticia x, char *date);
 void addTag(Noticia x,char *tag);
 void addTxt(Noticia x, char *txt);
 void addCategory(Noticia x, char *category);
-void printAll(Noticia x);
+void printNoticia(Noticia x);
+void printTag(Tag x);
 char* getId(Noticia x);
+void increment(Tag n);
+
+
 
 
 
@@ -37,6 +48,17 @@ Noticia initNoticia(){
     n->id = NULL;
 
     return n;
+}
+
+Tag initTag(char *name){
+    Tag n = malloc(sizeof(struct tag));
+    n->tag = strdup(name);
+    n->rept=1;
+    return n;
+}
+
+void increment(Tag n){
+    n->rept++;
 }
 
 void addId(Noticia x,char *t){
@@ -64,7 +86,7 @@ void addTag(Noticia x,char *t){
     x->tags[x->lenght_tags++] = strdup(t);
 }
 
-void printAll(Noticia x){
+void printNoticia(Noticia x){
     //imprime id
     if(x->id){
         printf("%s\n",x->id);
@@ -90,6 +112,15 @@ void printAll(Noticia x){
     if(x->text){
         printf("%s\n",x->text);
     }
+}
+
+void printTag(Tag x){
+    //imprime o nome
+    if(x->tag){
+        printf("%s  ->",x->tag);
+    }
+    //imprime o numero de repeticoes
+    printf(" %d\n",x->rept);
 }
 
 char* getId(Noticia x){

@@ -13,8 +13,13 @@
 
 char txt[1024*MB] ;
 
+
+
+GHashTable *tags;
 GTree *noticias;
 Noticia x;
+Tag aux;
+char *tag;
 
 %}
 
@@ -36,7 +41,20 @@ Noticia x;
 <ARTIGO>#TAG: {ECHO; BEGIN TAG;}//encontra tag
 <ARTIGO>#DATE: {ECHO; BEGIN DATE;}//encontra data
 
-<TAG>tag:\{[A-Z\ a-z]* {ECHO;addTag(x,yytext+5);}//todas as tags
+<TAG>tag:\{[A-Z\ a-z]*/\} {ECHO;tag = strdup(yytext+5);addTag(x,tag);
+                             
+                            gpointer find = g_hash_table_lookup(tags,tag);
+                            if(!find){
+                                Tag n = initTag(tag);
+                                g_hash_table_insert(tags,tag,n);
+                            }else{
+                                Tag n = (Tag) find;
+                                increment(n);
+                                g_hash_table_insert(tags,tag,n);
+                            }
+}
+
+
 <TAG>#ID: {ECHO; BEGIN ID;}//encontra id
 
 <ID>post-[0-9]+ {ECHO;addId(x,yytext);}
@@ -74,27 +92,35 @@ gint compareIds (gconstpointer name1, gconstpointer name2)
     return (strcmp (name1 , name2));
 }
 
-gboolean transverseFunc(void * key, void * value, void * data){
+//uso transverseFunc para a arvore e a hashtable, daó o warning
+void transverseFunc(void * key, void * value, void * data){
 
-    Noticia x = (Noticia) value;
-    printAll(x);
+    char * info = data;
+
+    if(strcmp(info,"tree")==0){
+        Noticia x = (Noticia) value;
+        printNoticia(x);
+    }else{
+       Tag aux = (Tag) value;
+       printTag(aux);
+    }
 
 }
 
 
 int main(int argc, char *argv[]){
     
-
+    tags = g_hash_table_new(g_int64_hash, g_int64_equal);
     noticias = g_tree_new((GCompareFunc) compareIds);
-
-    printf("%d\n", (int) g_tree_nnodes (noticias) );
+    
     printf("Inicio da filtragem\n");
 
     yylex(); //invocar a função de conhecimento que ele vai gerar para janeiro e os outros
 
     printf("Fim da filtragem\n");
 
-    g_tree_foreach(noticias, transverseFunc , NULL);
+    g_hash_table_foreach(tags, transverseFunc , "hash" );
+    //g_tree_foreach(noticias, transverseFunc , "tree");
     
     return 0;
 }
