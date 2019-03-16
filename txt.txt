@@ -1,6 +1,6 @@
 <!-- ====================2014/2015-sera-um-ano-dificil-diz-o-presidente-igual-aos-outros-acrescenta-o-povo/index.html -->
 <pub>
-#TAG: tag:{Eduardo dos Santos} tag:{Petróleo} tag:{mensagem} tag:{preços} tag:{coisas}
+#TAG: tag:{Eduardo dos Santos} tag:{Petróleo} tag:{precos} tag:{precos} tag:{precos} tag:{precos} tag:{coisas}
 #ID:{post-6243 post type-post status-publish format-standard has-post-thumbnail hentry category-nacional tag-eduardo-dos-santos tag-petroleo tag-mensagem tag-precos}
 Nacional
 
