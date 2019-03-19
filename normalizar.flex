@@ -64,7 +64,7 @@ char *tag;
 <CATEGORY>.* {ECHO;yytext[yyleng]='\0';addCategory(x,yytext);}
 <CATEGORY>\n\n {ECHO; BEGIN TITLE;}
 
-<TITLE>.* {ECHO; yytext[yyleng]='\0'; addTitle(x,yytext);BEGIN ARTIGO;}
+<TITLE>.* {ECHO; yytext[yyleng]='\0'; addTitle(x,strdup(yytext));BEGIN ARTIGO;}
 
 <DATE>.*\n\n {ECHO; BEGIN TEXT;}
 <DATE>.* {ECHO;yytext[yyleng]='\0'; addDate(x,yytext+9);}
@@ -87,14 +87,12 @@ int yywrap(){
     return 1;
 }
 
-gint compareIds (gconstpointer name1, gconstpointer name2)
-{
-    printf("strcmp: %d\n", strcmp (name1, name2));
+gint compareIds (gconstpointer name1, gconstpointer name2){
     return (strcmp (name1 , name2));
 }
 
 //uso transverseFunc para a arvore e a hashtable, daó o warning
-void transverseFunc(void * key, void * value, void * data){
+void transverseFunc(void * key, void * value, void *     data){
 
     char * info = data;
 
@@ -105,20 +103,36 @@ void transverseFunc(void * key, void * value, void * data){
        Tag aux = (Tag) value;
        printTag(aux);
     }
-
 }
 
 
 gboolean aplicaHtml(void *key, void *value, void *data){
-    FILE * ptr = (FILE *) data;
     Noticia x = (Noticia) value;
-    char filename[200];
+   
+    fprintf((FILE *) data,"        <li><a href='%s.html'>%s</a></li>\n",getId(x),getTitle(x));//transforma isto num titulo de ficheiro
 
-    sprintf(filename,"%s.html",getTitle(x));
-    fprintf(ptr,"<li><a href='%s'>%s</a></li>\n",filename,filename);//transforma isto num titulo de ficheiro
+    char filename[strlen(getId(x))+11];
+    sprintf(filename,"HTML/%s.html",getId(x));
 
+    char** tags = getTags(x);
+    char* strTags = strdup(tags[0]);
+
+    for(int i=1; i<getNumTags(x); i++){
+        strTags = (char*) realloc(strTags, strlen(strTags)+strlen(getTags(x)[i])+2);
+        strcat(strTags,",");
+        strcat(strTags, getTags(x)[i]);
+    }
+
+    FILE *f = fopen(filename,"w");
+    fprintf(f, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> %s </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"%s\">\n        <meta name=\"keywords\" content=\"%s\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1% ; padding-left: 1%\" >\n        <h2>%s</h2>\n\n        <h4>%s</h4>\n\n\n        <h4>Categoria: %s</h4>\n\n        \n\n        <div>\n\n            <h4>Tags:</h4>\n            <ul>\n"
+    , getId(x), getId(x), strTags, getTitle(x), getDate(x), getCategory(x));
+
+    for (int i = 0; i < getNumTags(x); i++){
+        fprintf(f, "                <li>%s</li>\n", tags[i]);
+    }
     
-    
+    fprintf(f, "            </ul>\n        </div>\n\n        <br>\n\n        <div style=\"padding-right: 5% ; padding-left: 4%\">\n            <p> \n                %s\n            </p>\n        </div>\n    </body>\n</html>",  getTxt(x));
+
     //yyin = fopen(aux,"r");
     //out = fopen(f,"w");
     
@@ -137,15 +151,15 @@ int main(int argc, char *argv[]){
 
     yylex(); //invocar a função de conhecimento que ele vai gerar para janeiro e os outros
 
-    printf("Fim da filtragem\n");
+    printf("\n\nFim da filtragem\n\n");
 
-    g_hash_table_foreach(tags, transverseFunc , "hash" );
-    g_tree_foreach(noticias, transverseFunc , "tree");
+    //g_hash_table_foreach(tags, transverseFunc , "hash" );
+    //g_tree_foreach(noticias, transverseFunc , "tree");
     
 
     //começa html
-    FILE *fptr;
-    fptr = fopen("HTML/index.html","w");
+    FILE *fptr = fopen("HTML/index.html","w");
+    fprintf(fptr,"<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n    </head>\n\n    <body>\n");
 
     if(fptr == NULL){
       perror("Error creating the HTML file");   
@@ -153,6 +167,7 @@ int main(int argc, char *argv[]){
    }
 
     g_tree_foreach(noticias,aplicaHtml,fptr);
+    fprintf(fptr,"    </body>\n</html>");
     fclose(fptr);
     
 

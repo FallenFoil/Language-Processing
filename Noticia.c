@@ -1,8 +1,5 @@
 #include "Noticia.h"
 
-
-
-
 typedef struct noticia{
 
     char *id;//id
@@ -30,8 +27,14 @@ void addTxt(Noticia x, char *txt);
 void addCategory(Noticia x, char *category);
 void printNoticia(Noticia x);
 void printTag(Tag x);
-char* getId(Noticia x);
 void increment(Tag n);
+char* getId(Noticia x);
+char* getTitle(Noticia x);
+char* getCategory(Noticia x);
+char* getDate(Noticia x);
+int getNumTags(Noticia x);
+char** getTags(Noticia x);
+char* getTxt(Noticia x);
 
 
 
@@ -127,3 +130,26 @@ char* getId(Noticia x){
     return x->id;
 }
 
+char* getTitle(Noticia x){
+    return x->title;
+}
+
+char* getCategory(Noticia x){
+    return x->category;
+}
+
+char* getDate(Noticia x){
+    return x->date;
+}
+
+int getNumTags(Noticia x){
+    return x->lenght_tags;
+}
+
+char** getTags(Noticia x){
+    return x->tags;
+}
+
+char* getTxt(Noticia x){
+    return x->text;
+}
