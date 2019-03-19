@@ -35,50 +35,52 @@ char *tag;
 %%
 
 
-\<pub\> {ECHO; x = initNoticia(); BEGIN ARTIGO;}//começo de uma nova noticia
+\<pub\>                         { x = initNoticia(); BEGIN ARTIGO;}//começo de uma nova noticia
 
-<ARTIGO>"</pub>" {ECHO; g_tree_insert(noticias, getId(x) , x); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
-<ARTIGO>(.|\n) {ECHO;}//imprime tudo o resto
-<ARTIGO>#TAG: {ECHO; BEGIN TAG;}//encontra tag
-<ARTIGO>#DATE: {ECHO; BEGIN DATE;}//encontra data
+<ARTIGO>"</pub>"                { g_tree_insert(noticias, getId(x) , x); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
+<ARTIGO>(.|\n)                  { ; }//imprime tudo o resto
+<ARTIGO>#TAG:                   { BEGIN TAG;}//encontra tag
+<ARTIGO>#DATE:                  { BEGIN DATE;}//encontra data
 
-<TAG>tag:\{[A-Z\ a-z]*/\} {ECHO;yytext[yyleng] = '\0';tag = strdup(yytext+5);  addTag(x,tag);
-                             
-                            gpointer find = g_hash_table_lookup(tags,tag);
-                            if(!find){
-                                Tag n = initTag(tag);
-                                g_hash_table_insert(tags,tag,n);
-                            }else{
-                                Tag n = (Tag) find;
-                                increment(n);
-                                g_hash_table_insert(tags,tag,n);
-                            }
-}
+<TAG>tag:\{[A-Z\ a-z]*/\}       {   yytext[yyleng] = '\0'; 
+                                    tag = strdup(yytext+5);  
+                                    addTag(x,tag); 
+                                    gpointer find = g_hash_table_lookup(tags,tag); 
+
+                                    if(!find){ 
+                                        Tag n = initTag(tag); 
+                                        g_hash_table_insert(tags,tag,n); 
+                                    }
+                                    else{ 
+                                        Tag n = (Tag) find; 
+                                        increment(n); 
+                                        g_hash_table_insert(tags,tag,n);
+                                    }
+                                }
+
+<TAG>#ID:                       { BEGIN ID; }//encontra id
+
+<ID>post-[0-9]+                 { yytext[yyleng]='\0'; addId(x,yytext); }
+<ID>\n                          { BEGIN CATEGORY; }
+
+<CATEGORY>.*                    {yytext[yyleng]='\0';addCategory(x,yytext); }
+<CATEGORY>\n\n                  { BEGIN TITLE; }
+
+<TITLE>.*                       { yytext[yyleng]='\0'; addTitle(x,strdup(yytext)); BEGIN ARTIGO; }
+
+<DATE>.*\n\n                    { BEGIN TEXT; }
+<DATE>.*                        { yytext[yyleng]='\0'; addDate(x,yytext+9); }
 
 
-<TAG>#ID: {ECHO; BEGIN ID;}//encontra id
 
-<ID>post-[0-9]+ {ECHO;yytext[yyleng]='\0';addId(x,yytext);}
-<ID>\n {ECHO;BEGIN CATEGORY;}
-
-<CATEGORY>.* {ECHO;yytext[yyleng]='\0';addCategory(x,yytext);}
-<CATEGORY>\n\n {ECHO; BEGIN TITLE;}
-
-<TITLE>.* {ECHO; yytext[yyleng]='\0'; addTitle(x,strdup(yytext));BEGIN ARTIGO;}
-
-<DATE>.*\n\n {ECHO; BEGIN TEXT;}
-<DATE>.* {ECHO;yytext[yyleng]='\0'; addDate(x,yytext+9);}
-
-
-
-<TEXT>.*\n {ECHO; strcat(txt,yytext);}//texto está todo na variavel txt
+<TEXT>.*\n { strcat(txt,yytext);}//texto está todo na variavel txt
 <TEXT>\n{3,} {addTxt(x,txt); strcpy(txt,""); printf("\n\n"); BEGIN ARTIGO;}//adiciona o texto, recomeça o txt e volta para o artigo
 
 
 
 
 
-(.*) {;}//tudo o que não tiver entre pub é removido
+(.*) {;}//tudo o que não tiver entre pub é ignorado
 (\n{3,}) {printf("\n\n");}//linhas em branco extra são removidas
 %%
 
@@ -159,7 +161,7 @@ int main(int argc, char *argv[]){
 
     //começa html
     FILE *fptr = fopen("HTML/index.html","w");
-    fprintf(fptr,"<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n    </head>\n\n    <body>\n");
+    fprintf(fptr,"<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n    </head>\n\n    <body>\n\n      <ul>");
 
     if(fptr == NULL){
       perror("Error creating the HTML file");   
@@ -167,7 +169,7 @@ int main(int argc, char *argv[]){
    }
 
     g_tree_foreach(noticias,aplicaHtml,fptr);
-    fprintf(fptr,"    </body>\n</html>");
+    fprintf(fptr,"\n        </ul>\n    </body>\n</html>");
     fclose(fptr);
     
 
