@@ -92,28 +92,29 @@ void addTag(Noticia x,char *t){
 void printNoticia(Noticia x){
     //imprime id
     if(x->id){
-        printf("%s\n",x->id);
+        printf("Id: %s\n",x->id);
     }
     //imprime titulo
     if(x->title){
-        printf("%s\n",x->title);
+        printf("title: %s\n",x->title);
     }
     //imprime tags
     int i = 0;
+    printf("Tags:\n");
     while(i<x->lenght_tags){
-        printf("%s\n",x->tags[i++]);
+        printf("-%s\n",x->tags[i++]);
     }
     //imprime data
     if(x->date){
-        printf("%s\n",x->date);
+        printf("Date: %s\n",x->date);
     }
     //imprime categoria
     if(x->category){
-        printf("%s\n",x->category);
+        printf("Category: %s\n",x->category);
     }
     //imprime txt
     if(x->text){
-        printf("%s\n",x->text);
+        printf("Texte: %s\n",x->text);
     }
 }
 

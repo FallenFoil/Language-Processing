@@ -21,10 +21,19 @@ GTree *noticias;
 Noticia x;
 Tag aux;
 char *tag;
+char tagBuffer[150];
+int bufferLength;
+
+gboolean myPrintNoticias(gpointer key, gpointer value, gpointer data){
+    Noticia x = (Noticia) value;
+    printf("Noticia\n");
+    printNoticia(x);
+}
 
 %}
 
 %x ARTIGO
+%x TAGS
 %x TAG
 %x DATE
 %x ID
@@ -34,34 +43,37 @@ char *tag;
 
 %%
 
-
 \<pub\>                         { x = initNoticia(); BEGIN ARTIGO;}//começo de uma nova noticia
 
-<ARTIGO>"</pub>"                { g_tree_insert(noticias, getId(x) , x); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
+<ARTIGO>"</pub>"                { g_tree_insert(noticias, getId(x), x);printNoticia(x);g_tree_foreach(noticias,myPrintNoticias, NULL); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
 <ARTIGO>(.|\n)                  { ; }//imprime tudo o resto
-<ARTIGO>#TAG:                   { BEGIN TAG;}//encontra tag
+<ARTIGO>#TAG:                   { BEGIN TAGS;}//encontra tag
 <ARTIGO>#DATE:                  { BEGIN DATE;}//encontra data
 
-<TAG>tag:\{[A-Z\ a-z]*/\}       {   yytext[yyleng] = '\0'; 
-                                    tag = strdup(yytext+5);  
-                                    addTag(x,tag); 
-                                    gpointer find = g_hash_table_lookup(tags,tag); 
+<TAGS>" tag:{"                  { bufferLength=0; BEGIN TAG; }
+<TAGS>"#ID:{"                   { BEGIN ID; }
 
-                                    if(!find){ 
-                                        Tag n = initTag(tag); 
-                                        g_hash_table_insert(tags,tag,n); 
-                                    }
-                                    else{ 
-                                        Tag n = (Tag) find; 
-                                        increment(n); 
-                                        g_hash_table_insert(tags,tag,n);
-                                    }
+<TAG>"}"                        { tagBuffer[bufferLength++]='\0';
+                                  tag = strdup(tagBuffer);  
+                                  addTag(x,tag);
+                                  gpointer find = g_hash_table_lookup(tags,tag);
+
+                                  if(!find){
+                                      Tag n = initTag(tag);
+                                      g_hash_table_insert(tags,tag,n);
+                                  }
+                                  else{
+                                      Tag n = (Tag) find;
+                                      increment(n);
+                                      g_hash_table_insert(tags,tag,n);
+                                  }
+                                  BEGIN TAGS; 
                                 }
+<TAG>.                          { tagBuffer[bufferLength++]=yytext[0]; }
 
-<TAG>#ID:                       { BEGIN ID; }//encontra id
-
-<ID>post-[0-9]+                 { yytext[yyleng]='\0'; addId(x,yytext); }
+<ID>"post-"[0-9]+               { yytext[yyleng]='\0'; char* str=strdup(yytext); addId(x,str); }
 <ID>\n                          { BEGIN CATEGORY; }
+<ID>.                           { ; }
 
 <CATEGORY>.*                    {yytext[yyleng]='\0';addCategory(x,yytext); }
 <CATEGORY>\n\n                  { BEGIN TITLE; }
@@ -71,17 +83,11 @@ char *tag;
 <DATE>.*\n\n                    { BEGIN TEXT; }
 <DATE>.*                        { yytext[yyleng]='\0'; addDate(x,yytext+9); }
 
-
-
 <TEXT>.*\n { strcat(txt,yytext);}//texto está todo na variavel txt
-<TEXT>\n{3,} {addTxt(x,txt); strcpy(txt,""); printf("\n\n"); BEGIN ARTIGO;}//adiciona o texto, recomeça o txt e volta para o artigo
-
-
-
-
+<TEXT>\n{3,} {addTxt(x,txt); strcpy(txt,""); BEGIN ARTIGO;}//adiciona o texto, recomeça o txt e volta para o artigo
 
 (.*) {;}//tudo o que não tiver entre pub é ignorado
-(\n{3,}) {printf("\n\n");}//linhas em branco extra são removidas
+(\n{3,}) {;}//linhas em branco extra são removidas
 %%
 
 
@@ -90,11 +96,15 @@ int yywrap(){
 }
 
 gint compareIds (gconstpointer name1, gconstpointer name2){
-    return (strcmp (name1 , name2));
+    if(name1 ==0) 
+        printf("ERRO!!\n");
+    else
+        return (strcmp (name1 , name2));
+    return 0;
 }
 
 //uso transverseFunc para a arvore e a hashtable, daó o warning
-void transverseFunc(void * key, void * value, void *     data){
+void transverseFunc(void * key, void * value, void * data){
 
     char * info = data;
 
@@ -143,17 +153,19 @@ gboolean aplicaHtml(void *key, void *value, void *data){
     return TRUE;
 }
 
-
 int main(int argc, char *argv[]){
     
     tags = g_hash_table_new(g_int64_hash, g_int64_equal);
     noticias = g_tree_new((GCompareFunc) compareIds);
-    
+    yyin = fopen("folha8_Small.txt", "r");
     printf("Inicio da filtragem\n");
 
-    yylex(); //invocar a função de conhecimento que ele vai gerar para janeiro e os outros
+    yylex();
 
     printf("\n\nFim da filtragem\n\n");
+    //g_tree_foreach(noticias,myPrintNoticias, NULL);
+    printf("TESTE:\n");
+    printNoticia((Noticia) g_tree_lookup(noticias, "post-4816"));
 
     //g_hash_table_foreach(tags, transverseFunc , "hash" );
     //g_tree_foreach(noticias, transverseFunc , "tree");
@@ -168,7 +180,8 @@ int main(int argc, char *argv[]){
       _exit(1);             
    }
 
-    g_tree_foreach(noticias,aplicaHtml,fptr);
+    //g_tree_foreach(noticias,aplicaHtml,fptr);
+
     fprintf(fptr,"\n        </ul>\n    </body>\n</html>");
     fclose(fptr);
     
