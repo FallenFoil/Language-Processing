@@ -21,10 +21,13 @@ GTree *noticias;
 Noticia x;
 Tag aux;
 char *tag;
+char tagBuffer[150];
+int bufferLength;
 
 %}
 
 %x ARTIGO
+%x TAGS
 %x TAG
 %x DATE
 %x ID
@@ -34,52 +37,51 @@ char *tag;
 
 %%
 
+\<pub\>                         {printf("COMECOU DE NOVO\n"); x = initNoticia(); BEGIN ARTIGO;}//começo de uma nova noticia
 
-\<pub\> {ECHO; x = initNoticia(); BEGIN ARTIGO;}//começo de uma nova noticia
+<ARTIGO>"</pub>"                { getId(x);g_tree_insert(noticias, getId(x), x);printf("Valor de x = %s",getId(x)); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
+<ARTIGO>(.|\n)                  { ; }
+<ARTIGO>#TAG:                   { BEGIN TAGS;}//encontra tag
+<ARTIGO>#DATE:                  { BEGIN DATE;}//encontra data
 
-<ARTIGO>"</pub>" {ECHO; g_tree_insert(noticias, getId(x) , x); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
-<ARTIGO>(.|\n) {ECHO;}//imprime tudo o resto
-<ARTIGO>#TAG: {ECHO; BEGIN TAG;}//encontra tag
-<ARTIGO>#DATE: {ECHO; BEGIN DATE;}//encontra data
+<TAGS>" tag:{"                  { bufferLength=0; BEGIN TAG; }
+<TAGS>"#ID:{"                   { BEGIN ID; }
 
-<TAG>tag:\{[A-Z\ a-z]*/\} {ECHO;yytext[yyleng] = '\0';tag = strdup(yytext+5);  addTag(x,tag);
-                             
-                            gpointer find = g_hash_table_lookup(tags,tag);
-                            if(!find){
-                                Tag n = initTag(tag);
-                                g_hash_table_insert(tags,tag,n);
-                            }else{
-                                Tag n = (Tag) find;
-                                increment(n);
-                                g_hash_table_insert(tags,tag,n);
-                            }
-}
+<TAG>"}"                        { tagBuffer[bufferLength++]='\0';
+                                  tag = strdup(tagBuffer);  
+                                  addTag(x,tag);
+                                  gpointer find = g_hash_table_lookup(tags,tag);
 
+                                  if(!find){
+                                      Tag n = initTag(tag);
+                                      g_hash_table_insert(tags,tag,n);
+                                  }
+                                  else{
+                                      Tag n = (Tag) find;
+                                      increment(n);
+                                      g_hash_table_insert(tags,tag,n);
+                                  }
+                                  BEGIN TAGS; 
+                                }
+<TAG>.                          { tagBuffer[bufferLength++]=yytext[0]; }
 
-<TAG>#ID: {ECHO; BEGIN ID;}//encontra id
+<ID>"post-"[0-9]+               { yytext[yyleng]='\0'; char* str=strdup(yytext); addId(x,str); }
+<ID>\n                          { BEGIN CATEGORY; }
+<ID>.                           { ; }
 
-<ID>post-[0-9]+ {ECHO;yytext[yyleng]='\0';addId(x,yytext);}
-<ID>\n {ECHO;BEGIN CATEGORY;}
+<CATEGORY>.*                    {yytext[yyleng]='\0';addCategory(x,yytext); }
+<CATEGORY>\n\n                  { BEGIN TITLE; }
 
-<CATEGORY>.* {ECHO;yytext[yyleng]='\0';addCategory(x,yytext);}
-<CATEGORY>\n\n {ECHO; BEGIN TITLE;}
+<TITLE>.*                       { yytext[yyleng]='\0'; addTitle(x,strdup(yytext)); BEGIN ARTIGO; }
 
-<TITLE>.* {ECHO; yytext[yyleng]='\0'; addTitle(x,yytext);BEGIN ARTIGO;}
+<DATE>.*\n\n                    { BEGIN TEXT; }
+<DATE>.*                        { yytext[yyleng]='\0'; addDate(x,yytext+9); }
 
-<DATE>.*\n\n {ECHO; BEGIN TEXT;}
-<DATE>.* {ECHO;yytext[yyleng]='\0'; addDate(x,yytext+9);}
+<TEXT>.*\n { strcat(txt,yytext);}//texto está todo na variavel txt
+<TEXT>\n{3,} {addTxt(x,txt); strcpy(txt,""); BEGIN ARTIGO;}//adiciona o texto, recomeça o txt e volta para o artigo
 
-
-
-<TEXT>.*\n {ECHO; strcat(txt,yytext);}//texto está todo na variavel txt
-<TEXT>\n{3,} {addTxt(x,txt); strcpy(txt,""); printf("\n\n"); BEGIN ARTIGO;}//adiciona o texto, recomeça o txt e volta para o artigo
-
-
-
-
-
-(.*) {;}//tudo o que não tiver entre pub é removido
-(\n{3,}) {printf("\n\n");}//linhas em branco extra são removidas
+(.*) {;}//tudo o que não tiver entre pub é ignorado
+(\n{3,}) {;}//linhas em branco extra são removidas
 %%
 
 
@@ -87,10 +89,12 @@ int yywrap(){
     return 1;
 }
 
-gint compareIds (gconstpointer name1, gconstpointer name2)
-{
-    printf("strcmp: %d\n", strcmp (name1, name2));
-    return (strcmp (name1 , name2));
+gint compareIds (gconstpointer name1, gconstpointer name2){
+
+   printf("Resultado = %d\n", strcmp (name1 , name2)); 
+   
+   return (strcmp (name1 , name2));
+    
 }
 
 //uso transverseFunc para a arvore e a hashtable, daó o warning
@@ -105,55 +109,72 @@ void transverseFunc(void * key, void * value, void * data){
        Tag aux = (Tag) value;
        printTag(aux);
     }
-
 }
 
 
 gboolean aplicaHtml(void *key, void *value, void *data){
-    FILE * ptr = (FILE *) data;
     Noticia x = (Noticia) value;
-    char filename[200];
+   
+    fprintf((FILE *) data,"        <li><a href='%s.html'>%s</a></li>\n",getId(x),getTitle(x));//transforma isto num titulo de ficheiro
 
-    sprintf(filename,"%s.html",getTitle(x));
-    fprintf(ptr,"<li><a href='%s'>%s</a></li>\n",filename,filename);//transforma isto num titulo de ficheiro
+    char filename[strlen(getId(x))+11];
+    sprintf(filename,"HTML/%s.html",getId(x));
 
+    char** tags = getTags(x);
+    char* strTags = strdup(tags[0]);
+
+    for(int i=1; i<getNumTags(x); i++){
+        strTags = (char*) realloc(strTags, strlen(strTags)+strlen(getTags(x)[i])+2);
+        strcat(strTags,",");
+        strcat(strTags, getTags(x)[i]);
+    }
+
+    FILE *f = fopen(filename,"w");
+    fprintf(f, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> %s </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"%s\">\n        <meta name=\"keywords\" content=\"%s\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1% ; padding-left: 1%\" >\n        <h2>%s</h2>\n\n        <h4>%s</h4>\n\n\n        <h4>Categoria: %s</h4>\n\n        \n\n        <div>\n\n            <h4>Tags:</h4>\n            <ul>\n"
+    , getId(x), getId(x), strTags, getTitle(x), getDate(x), getCategory(x));
+
+    for (int i = 0; i < getNumTags(x); i++){
+        fprintf(f, "                <li>%s</li>\n", tags[i]);
+    }
     
-    
-    //yyin = fopen(aux,"r");
-    //out = fopen(f,"w");
+    fprintf(f, "            </ul>\n        </div>\n\n        <br>\n\n        <div style=\"padding-right: 5% ; padding-left: 4%\">\n            <p> \n                %s\n            </p>\n        </div>\n    </body>\n</html>",  getTxt(x));
     
     yylex();
 
     return TRUE;
 }
 
-
 int main(int argc, char *argv[]){
     
     tags = g_hash_table_new(g_int64_hash, g_int64_equal);
     noticias = g_tree_new((GCompareFunc) compareIds);
-    
+    //yyin = fopen("folha8_Small.txt", "r");
     printf("Inicio da filtragem\n");
 
-    yylex(); //invocar a função de conhecimento que ele vai gerar para janeiro e os outros
+    yylex();
 
-    printf("Fim da filtragem\n");
+    printf("\n\nFim da filtragem\n\n");
+    //g_tree_foreach(noticias,myPrintNoticias, NULL);
+    //printf("TESTE:\n");
+    //printNoticia((Noticia) g_tree_lookup(noticias, "post-4816"));
 
-    g_hash_table_foreach(tags, transverseFunc , "hash" );
+    //g_hash_table_foreach(tags, transverseFunc , "hash" );
     g_tree_foreach(noticias, transverseFunc , "tree");
     
 
-    //começa html
-    FILE *fptr;
-    fptr = fopen("HTML/index.html","w");
+    /*começa html
+    /FILE *fptr = fopen("HTML/index.html","w");
+    fprintf(fptr,"<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n    </head>\n\n    <body>\n\n      <ul>");
 
     if(fptr == NULL){
       perror("Error creating the HTML file");   
       _exit(1);             
    }
+    */
+    //g_tree_foreach(noticias,aplicaHtml,fptr);
 
-    g_tree_foreach(noticias,aplicaHtml,fptr);
-    fclose(fptr);
+    //fprintf(fptr,"\n        </ul>\n    </body>\n</html>");
+    //fclose(fptr);
     
 
 

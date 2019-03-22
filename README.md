@@ -8,7 +8,7 @@
 
 ## Deadlines
 
-* **24 de Março:** Entrega 1ª trabalho prático;
+* **24 de Março (+ 3/4 Dias):** Entrega 1ª trabalho prático;
 
 <!-- ----------------------------------------------------------------------- -->
 

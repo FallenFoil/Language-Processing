@@ -1,8 +1,5 @@
 #include "Noticia.h"
 
-
-
-
 typedef struct noticia{
 
     char *id;//id
@@ -31,6 +28,13 @@ void addCategory(Noticia x, char *category);
 void printNoticia(Noticia x);
 void printTag(Tag x);
 void increment(Tag n);
+char* getId(Noticia x);
+char* getTitle(Noticia x);
+char* getCategory(Noticia x);
+char* getDate(Noticia x);
+int getNumTags(Noticia x);
+char** getTags(Noticia x);
+char* getTxt(Noticia x);
 
 //FALTAM FAZER
 char* getId(Noticia x);
@@ -97,28 +101,29 @@ void addTag(Noticia x,char *t){
 void printNoticia(Noticia x){
     //imprime id
     if(x->id){
-        printf("%s\n",x->id);
+        printf("Id: %s\n",x->id);
     }
     //imprime titulo
     if(x->title){
-        printf("%s\n",x->title);
+        printf("title: %s\n",x->title);
     }
     //imprime tags
     int i = 0;
+    printf("Tags:\n");
     while(i<x->lenght_tags){
-        printf("%s\n",x->tags[i++]);
+        printf("-%s\n",x->tags[i++]);
     }
     //imprime data
     if(x->date){
-        printf("%s\n",x->date);
+        printf("Date: %s\n",x->date);
     }
     //imprime categoria
     if(x->category){
-        printf("%s\n",x->category);
+        printf("Category: %s\n",x->category);
     }
     //imprime txt
     if(x->text){
-        printf("%s\n",x->text);
+        printf("Texte: %s\n",x->text);
     }
 }
 
@@ -141,4 +146,24 @@ char* getId(Noticia x){
 char* getTitle(Noticia x){
 
     return x->title;
+}
+
+char* getCategory(Noticia x){
+    return x->category;
+}
+
+char* getDate(Noticia x){
+    return x->date;
+}
+
+int getNumTags(Noticia x){
+    return x->lenght_tags;
+}
+
+char** getTags(Noticia x){
+    return x->tags;
+}
+
+char* getTxt(Noticia x){
+    return x->text;
 }

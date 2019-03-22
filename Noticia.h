@@ -21,6 +21,12 @@ void addCategory(Noticia x, char *category);//adiciona uma categoria á noticia
 void printNoticia(Noticia x);//imprime toda a informação de uma determinada noticia
 void printTag(Tag x);
 char* getId(Noticia x);//devolve o id de uma noticia
+char* getTitle(Noticia x);
+char* getCategory(Noticia x);
+char* getDate(Noticia x);
+int getNumTags(Noticia x);
+char** getTags(Noticia x);
+char* getTxt(Noticia x);
 
 //Gets e Sets para a Noticia
 char* getId(Noticia x);
