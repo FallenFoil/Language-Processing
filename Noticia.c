@@ -30,8 +30,16 @@ void addTxt(Noticia x, char *txt);
 void addCategory(Noticia x, char *category);
 void printNoticia(Noticia x);
 void printTag(Tag x);
-char* getId(Noticia x);
 void increment(Tag n);
+
+//FALTAM FAZER
+char* getId(Noticia x);
+char* getTitle(Noticia x);
+char* getDate(Noticia x);
+char** getTag(Noticia x);
+char* getCategory(Noticia x);
+char* getTxt(Noticia x);
+
 
 
 
@@ -123,7 +131,14 @@ void printTag(Tag x){
     printf(" %d\n",x->rept);
 }
 
+
+
+//Gets e Sets para a Noticia
 char* getId(Noticia x){
     return x->id;
 }
 
+char* getTitle(Noticia x){
+
+    return x->title;
+}

@@ -22,4 +22,12 @@ void printNoticia(Noticia x);//imprime toda a informação de uma determinada no
 void printTag(Tag x);
 char* getId(Noticia x);//devolve o id de uma noticia
 
+//Gets e Sets para a Noticia
+char* getId(Noticia x);
+char* getTitle(Noticia x);
+char* getDate(Noticia x);
+char** getTag(Noticia x);
+char* getCategory(Noticia x);
+char* getTxt(Noticia x);
+
 #endif
