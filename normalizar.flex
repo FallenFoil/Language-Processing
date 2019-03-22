@@ -17,7 +17,7 @@ char txt[1024*MB] ;
 FILE *out;
 
 GHashTable *tags;
-GTree *noticias;
+GList *noticias;
 Noticia x;
 Tag aux;
 char *tag;
@@ -37,9 +37,9 @@ int bufferLength;
 
 %%
 
-\<pub\>                         {printf("COMECOU DE NOVO\n"); x = initNoticia(); BEGIN ARTIGO;}//começo de uma nova noticia
+\<pub\>                         {x = initNoticia();  BEGIN ARTIGO;}//começo de uma nova noticia
 
-<ARTIGO>"</pub>"                { getId(x);g_tree_insert(noticias, getId(x), x);printf("Valor de x = %s",getId(x)); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
+<ARTIGO>"</pub>"                { noticias = g_list_append(noticias, x); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
 <ARTIGO>(.|\n)                  { ; }
 <ARTIGO>#TAG:                   { BEGIN TAGS;}//encontra tag
 <ARTIGO>#DATE:                  { BEGIN DATE;}//encontra data
@@ -89,30 +89,24 @@ int yywrap(){
     return 1;
 }
 
-gint compareIds (gconstpointer name1, gconstpointer name2){
 
-   printf("Resultado = %d\n", strcmp (name1 , name2)); 
-   
-   return (strcmp (name1 , name2));
+
+void transverseList(void * value, void * data){
+
+    Noticia x = (Noticia) value;
+    printNoticia(x);
     
 }
 
-//uso transverseFunc para a arvore e a hashtable, daó o warning
 void transverseFunc(void * key, void * value, void * data){
+    
+    Tag aux = (Tag) value;
+    printTag(aux);
 
-    char * info = data;
-
-    if(strcmp(info,"tree")==0){
-        Noticia x = (Noticia) value;
-        printNoticia(x);
-    }else{
-       Tag aux = (Tag) value;
-       printTag(aux);
-    }
 }
 
 
-gboolean aplicaHtml(void *key, void *value, void *data){
+void aplicaHtml(void *value, void *data){
     Noticia x = (Noticia) value;
    
     fprintf((FILE *) data,"        <li><a href='%s.html'>%s</a></li>\n",getId(x),getTitle(x));//transforma isto num titulo de ficheiro
@@ -129,6 +123,9 @@ gboolean aplicaHtml(void *key, void *value, void *data){
         strcat(strTags, getTags(x)[i]);
     }
 
+    printf("%s\n", filename);
+    
+    /*
     FILE *f = fopen(filename,"w");
     fprintf(f, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> %s </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"%s\">\n        <meta name=\"keywords\" content=\"%s\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1% ; padding-left: 1%\" >\n        <h2>%s</h2>\n\n        <h4>%s</h4>\n\n\n        <h4>Categoria: %s</h4>\n\n        \n\n        <div>\n\n            <h4>Tags:</h4>\n            <ul>\n"
     , getId(x), getId(x), strTags, getTitle(x), getDate(x), getCategory(x));
@@ -138,43 +135,42 @@ gboolean aplicaHtml(void *key, void *value, void *data){
     }
     
     fprintf(f, "            </ul>\n        </div>\n\n        <br>\n\n        <div style=\"padding-right: 5% ; padding-left: 4%\">\n            <p> \n                %s\n            </p>\n        </div>\n    </body>\n</html>",  getTxt(x));
-    
+    */
     yylex();
-
-    return TRUE;
 }
+
+
 
 int main(int argc, char *argv[]){
     
     tags = g_hash_table_new(g_int64_hash, g_int64_equal);
-    noticias = g_tree_new((GCompareFunc) compareIds);
+
     //yyin = fopen("folha8_Small.txt", "r");
     printf("Inicio da filtragem\n");
 
     yylex();
 
     printf("\n\nFim da filtragem\n\n");
-    //g_tree_foreach(noticias,myPrintNoticias, NULL);
-    //printf("TESTE:\n");
-    //printNoticia((Noticia) g_tree_lookup(noticias, "post-4816"));
-
-    //g_hash_table_foreach(tags, transverseFunc , "hash" );
-    g_tree_foreach(noticias, transverseFunc , "tree");
+    
     
 
-    /*começa html
-    /FILE *fptr = fopen("HTML/index.html","w");
+    //g_hash_table_foreach(tags, transverseFunc , NULL );
+    //g_list_foreach(noticias, transverseList , NULL);
+    
+
+    
+    FILE *fptr = fopen("HTML/index.html","w");
     fprintf(fptr,"<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n    </head>\n\n    <body>\n\n      <ul>");
 
     if(fptr == NULL){
       perror("Error creating the HTML file");   
       _exit(1);             
    }
-    */
-    //g_tree_foreach(noticias,aplicaHtml,fptr);
+    
+    g_list_foreach(noticias,aplicaHtml,fptr);
 
-    //fprintf(fptr,"\n        </ul>\n    </body>\n</html>");
-    //fclose(fptr);
+    fprintf(fptr,"\n        </ul>\n    </body>\n</html>");
+    fclose(fptr);
     
 
 
