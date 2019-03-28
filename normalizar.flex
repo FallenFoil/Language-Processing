@@ -36,7 +36,7 @@ int bufferLength;
 
 \<pub\>                         { x = initNoticia();  BEGIN ARTIGO; }
 
-<ARTIGO>"</pub>"                { if(getId(x)) g_hash_table_insert(noticias,getId(x),x);
+<ARTIGO>"</pub>"                {if(getId(x))  {g_hash_table_insert(noticias,getId(x),x);}
                                  else g_hash_table_insert(noticias,"Sem titulo",x);
                                 BEGIN INITIAL;}
 <ARTIGO>#TAG:                   { BEGIN TAGS; }
@@ -150,10 +150,10 @@ void tagsNums(gpointer key, gpointer value, gpointer user_data){
 
 int main(int argc, char *argv[]){
     
-    noticias = g_hash_table_new(g_int64_hash, g_int64_equal);
-    tags = g_hash_table_new(g_int64_hash, g_int64_equal);
+    noticias = g_hash_table_new(g_str_hash, g_int64_equal);
+    tags = g_hash_table_new(g_str_hash,  g_str_equal);
 
-    //yyin = fopen("folha8.OUT.txt", "r");
+    yyin = fopen("folha8.OUT.txt", "r");
 
     printf("Inicio da filtragem\n");
 
