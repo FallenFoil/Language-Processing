@@ -20,7 +20,7 @@ Noticia x;
 char *tag;
 char tagBuffer[1500];
 int bufferLength;
-
+int semId = 0;
 %}
 
 %x ARTIGO
@@ -36,9 +36,14 @@ int bufferLength;
 
 \<pub\>                         { x = initNoticia();  BEGIN ARTIGO; }
 
-<ARTIGO>"</pub>"                {if(getId(x))  {g_hash_table_insert(noticias,getId(x),x);}
-                                 else g_hash_table_insert(noticias,"Sem titulo",x);
-                                BEGIN INITIAL;}
+<ARTIGO>"</pub>"                { if(getId(x))  {g_hash_table_insert(noticias,getId(x),x);}
+                                  else{
+                                  	char* strId = malloc(16);
+							        sprintf(strId,"semId-%d", semId);
+							        semId++;
+							        addId(x,strId);
+									g_hash_table_insert(noticias,getId(x),x);}
+                                  BEGIN INITIAL; }
 <ARTIGO>#TAG:                   { BEGIN TAGS; }
 <ARTIGO>#DATE:                  { BEGIN DATE; }
 <ARTIGO>#ID:\{					{ BEGIN ID; }
@@ -108,39 +113,34 @@ void aplicaHtml(void *key,void *value, void *data){
     
     fprintf((FILE *) data,"        <li><a href='%s.html'>%s</a></li>\n",getId(x),getTitle(x));
 
-    if(getId(x) == NULL){
-        printf("Noticia sem ID\n");
+    char* filename = (char*) calloc(strlen(getId(x))+21, sizeof(char));
+    strcpy(filename, "HTML/Noticias/");
+    strcat(filename, getId(x));
+    strcat(filename, ".html");
+      
+    char** tags = getTags(x);
+       
+    FILE *f = fopen(filename,"w");
+    if(f == NULL){
+        perror("Error creating the HTML file");              
     }
-    else{
-        char* filename = (char*) calloc(strlen(getId(x))+21, sizeof(char));
-        strcpy(filename, "HTML/Noticias/");
-        strcat(filename, getId(x));
-        strcat(filename, ".html");
-        
-        char** tags = getTags(x);
-        
-        FILE *f = fopen(filename,"w");
-        if(f == NULL){
-            perror("Error creating the HTML file");              
+    else{        
+        fprintf(f, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> %s </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"%s\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1%% ; padding-left: 1%%\" >\n        <h2>%s</h2>\n\n        <h4>%s</h4>\n\n\n        <h4>Categoria: %s</h4>\n\n        \n\n        <div>\n\n            <h4>Tags:</h4>\n"
+        , getId(x), getId(x), getTitle(x), getDate(x), getCategory(x));
+           
+        if(getNumTags(x)>0){
+            fprintf(f, "            <ul>\n");
+            for (int i = 0; i < getNumTags(x); i++){
+                fprintf(f, "                <li>%s</li>\n", tags[i]);
+            }
         }
-        else{        
-            fprintf(f, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> %s </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"%s\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1%% ; padding-left: 1%%\" >\n        <h2>%s</h2>\n\n        <h4>%s</h4>\n\n\n        <h4>Categoria: %s</h4>\n\n        \n\n        <div>\n\n            <h4>Tags:</h4>\n"
-            , getId(x), getId(x), getTitle(x), getDate(x), getCategory(x));
+        else{
+            fprintf(f, "                Sem Tags\n");
+        }
             
-            if(getNumTags(x)>0){
-                fprintf(f, "            <ul>\n");
-                for (int i = 0; i < getNumTags(x); i++){
-                    fprintf(f, "                <li>%s</li>\n", tags[i]);
-                }
-            }
-            else{
-                fprintf(f, "                Sem Tags\n");
-            }
-            
-            fprintf(f, "            </ul>\n        </div>\n\n        <br>\n\n        <div style=\"padding-right: 5%% ; padding-left: 4%%\">\n            <p> \n                %s\n            </p>\n        </div>\n    </body>\n</html>",  getTxt(x));
+        fprintf(f, "            </ul>\n        </div>\n\n        <br>\n\n        <div style=\"padding-right: 5%% ; padding-left: 4%%\">\n            <p> \n                %s\n            </p>\n        </div>\n    </body>\n</html>",  getTxt(x));
         }
         fclose(f);
-    }
 }
 
 void tagsNums(gpointer key, gpointer value, gpointer user_data){

@@ -2,3 +2,5 @@
 *.o
 normalizar.c
 program
+HTML/Noticias/*
+HTML/Tags/*
