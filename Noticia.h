@@ -12,6 +12,7 @@ typedef struct tag *Tag;
 Noticia initNoticia();//inicializa a noticia
 Tag initTag(char *name);
 void increment(Tag n);
+int getTagRep(Tag n);
 void addId(Noticia x, char *Id);//adiciona um id á noticia
 void addTitle(Noticia x, char *title);//adiciona um titulo á noticia
 void addDate(Noticia x, char *date);//adiciona uma data á noticia
@@ -26,14 +27,6 @@ char* getCategory(Noticia x);
 char* getDate(Noticia x);
 int getNumTags(Noticia x);
 char** getTags(Noticia x);
-char* getTxt(Noticia x);
-
-//Gets e Sets para a Noticia
-char* getId(Noticia x);
-char* getTitle(Noticia x);
-char* getDate(Noticia x);
-char** getTag(Noticia x);
-char* getCategory(Noticia x);
 char* getTxt(Noticia x);
 
 #endif

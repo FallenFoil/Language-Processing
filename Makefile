@@ -23,3 +23,5 @@ clean:
 	$(RM) *.o
 	$(RM) normalizar.c
 	$(RM) program
+	$(RM) HTML/Noticias/*
+	$(RM) HTML/Tags/*

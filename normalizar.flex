@@ -1,6 +1,4 @@
 %{
-//escape 
-//Serve para declarar variaveis ou bibliotecas
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -12,7 +10,7 @@
 
 #define MB 1024
 
-char txt[1024*MB] ;
+char txt[100*MB] ;
 
 FILE *out;
 
@@ -21,7 +19,7 @@ GList *noticias;
 Noticia x;
 Tag aux;
 char *tag;
-char tagBuffer[150];
+char tagBuffer[1500];
 int bufferLength;
 
 %}
@@ -37,18 +35,19 @@ int bufferLength;
 
 %%
 
-\<pub\>                         {x = initNoticia();  BEGIN ARTIGO;}//começo de uma nova noticia
+\<pub\>                         { x = initNoticia();  BEGIN ARTIGO; }
 
-<ARTIGO>"</pub>"                { noticias = g_list_append(noticias, x); BEGIN INITIAL;} //Não encontra com barra.Falar com César Adiciona a noticia á arvore
+<ARTIGO>"</pub>"                { noticias = g_list_append(noticias, x); BEGIN INITIAL; }
+<ARTIGO>#TAG:                   { BEGIN TAGS; }
+<ARTIGO>#DATE:                  { BEGIN DATE; }
+<ARTIGO>#ID:\{					{ BEGIN ID; }
 <ARTIGO>(.|\n)                  { ; }
-<ARTIGO>#TAG:                   { BEGIN TAGS;}//encontra tag
-<ARTIGO>#DATE:                  { BEGIN DATE;}//encontra data
 
-<TAGS>" tag:{"                  { bufferLength=0; BEGIN TAG; }
+<TAGS>"tag:{"                  	{ bufferLength=0; BEGIN TAG; }
 <TAGS>"#ID:{"                   { BEGIN ID; }
 
-<TAG>"}"                        { tagBuffer[bufferLength++]='\0';
-                                  tag = strdup(tagBuffer);  
+<TAG>"}"[ \n]                   { tagBuffer[bufferLength++]='\0';
+                                  tag = strdup(tagBuffer);
                                   addTag(x,tag);
                                   gpointer find = g_hash_table_lookup(tags,tag);
 
@@ -66,7 +65,7 @@ int bufferLength;
 <TAG>.                          { tagBuffer[bufferLength++]=yytext[0]; }
 
 <ID>"post-"[0-9]+               { yytext[yyleng]='\0'; char* str=strdup(yytext); addId(x,str); }
-<ID>\n                          { BEGIN CATEGORY; }
+<ID>(\n)                        { BEGIN CATEGORY; }
 <ID>.                           { ; }
 
 <CATEGORY>.*                    {yytext[yyleng]='\0';addCategory(x,yytext); }
@@ -74,14 +73,13 @@ int bufferLength;
 
 <TITLE>.*                       { yytext[yyleng]='\0'; addTitle(x,strdup(yytext)); BEGIN ARTIGO; }
 
-<DATE>.*\n\n                    { BEGIN TEXT; }
+<DATE>(.*\n\n)                  { BEGIN TEXT; }
 <DATE>.*                        { yytext[yyleng]='\0'; addDate(x,yytext+9); }
 
-<TEXT>.*\n { strcat(txt,yytext);}//texto está todo na variavel txt
-<TEXT>\n{3,} {addTxt(x,txt); strcpy(txt,""); BEGIN ARTIGO;}//adiciona o texto, recomeça o txt e volta para o artigo
+<TEXT>.*\n 						{ strcat(txt,yytext); }//texto está todo na variavel txt
+<TEXT>\n{3,} 					{ addTxt(x,txt); strcpy(txt,""); BEGIN ARTIGO; }//adiciona o texto, recomeça o txt e volta para o artigo
 
-(.*) {;}//tudo o que não tiver entre pub é ignorado
-(\n{3,}) {;}//linhas em branco extra são removidas
+(.|\n)                			{ ; }
 %%
 
 
@@ -89,90 +87,98 @@ int yywrap(){
     return 1;
 }
 
-
-
-void transverseList(void * value, void * data){
-
+void printList(void * value, void * data){
     Noticia x = (Noticia) value;
     printNoticia(x);
-    
 }
 
 void transverseFunc(void * key, void * value, void * data){
-    
     Tag aux = (Tag) value;
     printTag(aux);
-
 }
-
 
 void aplicaHtml(void *value, void *data){
     Noticia x = (Noticia) value;
-   
-    fprintf((FILE *) data,"        <li><a href='%s.html'>%s</a></li>\n",getId(x),getTitle(x));//transforma isto num titulo de ficheiro
-
-    char filename[strlen(getId(x))+11];
-    sprintf(filename,"HTML/%s.html",getId(x));
-
-    char** tags = getTags(x);
-    char* strTags = strdup(tags[0]);
-
-    for(int i=1; i<getNumTags(x); i++){
-        strTags = (char*) realloc(strTags, strlen(strTags)+strlen(getTags(x)[i])+2);
-        strcat(strTags,",");
-        strcat(strTags, getTags(x)[i]);
-    }
-
-    printf("%s\n", filename);
     
-    /*
-    FILE *f = fopen(filename,"w");
-    fprintf(f, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> %s </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"%s\">\n        <meta name=\"keywords\" content=\"%s\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1% ; padding-left: 1%\" >\n        <h2>%s</h2>\n\n        <h4>%s</h4>\n\n\n        <h4>Categoria: %s</h4>\n\n        \n\n        <div>\n\n            <h4>Tags:</h4>\n            <ul>\n"
-    , getId(x), getId(x), strTags, getTitle(x), getDate(x), getCategory(x));
+    fprintf((FILE *) data,"        <li><a href='%s.html'>%s</a></li>\n",getId(x),getTitle(x));
 
-    for (int i = 0; i < getNumTags(x); i++){
-        fprintf(f, "                <li>%s</li>\n", tags[i]);
+    if(getId(x) == NULL){
+        printf("Noticia sem ID\n");
     }
-    
-    fprintf(f, "            </ul>\n        </div>\n\n        <br>\n\n        <div style=\"padding-right: 5% ; padding-left: 4%\">\n            <p> \n                %s\n            </p>\n        </div>\n    </body>\n</html>",  getTxt(x));
-    */
-    yylex();
+    else{
+        char* filename = (char*) calloc(strlen(getId(x))+21, sizeof(char));
+        strcpy(filename, "HTML/Noticias/");
+        strcat(filename, getId(x));
+        strcat(filename, ".html");
+        
+        char** tags = getTags(x);
+        
+        FILE *f = fopen(filename,"w");
+        if(f == NULL){
+            perror("Error creating the HTML file");              
+        }
+        else{        
+            fprintf(f, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> %s </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"%s\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1%% ; padding-left: 1%%\" >\n        <h2>%s</h2>\n\n        <h4>%s</h4>\n\n\n        <h4>Categoria: %s</h4>\n\n        \n\n        <div>\n\n            <h4>Tags:</h4>\n"
+            , getId(x), getId(x), getTitle(x), getDate(x), getCategory(x));
+            
+            if(getNumTags(x)>0){
+                fprintf(f, "            <ul>\n");
+                for (int i = 0; i < getNumTags(x); i++){
+                    fprintf(f, "                <li>%s</li>\n", tags[i]);
+                }
+            }
+            else{
+                fprintf(f, "                Sem Tags\n");
+            }
+            
+            fprintf(f, "            </ul>\n        </div>\n\n        <br>\n\n        <div style=\"padding-right: 5%% ; padding-left: 4%%\">\n            <p> \n                %s\n            </p>\n        </div>\n    </body>\n</html>",  getTxt(x));
+        }
+        fclose(f);
+    }
 }
 
-
+void tagsNums(gpointer key, gpointer value, gpointer user_data){
+	Tag t = (Tag) value;
+	fprintf((FILE*) user_data, "<tr> <td> %s </td> <td> %d </td> </tr>\n", (char*) key, getTagRep(t));
+}
 
 int main(int argc, char *argv[]){
     
     tags = g_hash_table_new(g_int64_hash, g_int64_equal);
 
-    //yyin = fopen("folha8_Small.txt", "r");
+    yyin = fopen("folha8.OUT.txt", "r");
+
     printf("Inicio da filtragem\n");
 
     yylex();
 
-    printf("\n\nFim da filtragem\n\n");
-    
-    
+    printf("\n\nFim da filtragem\n\n");    
 
-    //g_hash_table_foreach(tags, transverseFunc , NULL );
-    //g_list_foreach(noticias, transverseList , NULL);
+    //Criação dos ficheiros com as Noticias
+    FILE *index = fopen("HTML/Noticias/index.html","w");
+    if(index == NULL){
+      	perror("Error creating the HTML file");   
+    	_exit(1);             
+   	}
+    fprintf(index,"<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> NULLticias </title>\n        <meta charset=\"UTF-8\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1%% ; padding-left: 1%%\" >\n      	<ul>");
     
+    g_list_foreach(noticias,aplicaHtml,index);
 
+    fprintf(index,"\n        </ul>\n    </body>\n</html>");
+    fclose(index);
+
+    //Criação do ficheiro com todas as Tags e as suas repetiçoes
+    FILE* tagsFile = fopen("HTML/Tags/tags.html", "w");
+    if(index == NULL){
+      	perror("Error creating the HTML file");   
+    	_exit(1);             
+   	}
+    fprintf(tagsFile, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> Tags </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"Ocorrencias de tags\">\n        <meta name=\"keywords\" content=\"Tags,Ocorrencias de Tags\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1%% ; padding-left: 1%%\" >\n        <table> \n        	<tr> <th>Tag</th> <th>Number of repetitions </th> </tr>");
     
-    FILE *fptr = fopen("HTML/index.html","w");
-    fprintf(fptr,"<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n    </head>\n\n    <body>\n\n      <ul>");
+    g_hash_table_foreach(tags, tagsNums, tagsFile);
 
-    if(fptr == NULL){
-      perror("Error creating the HTML file");   
-      _exit(1);             
-   }
-    
-    g_list_foreach(noticias,aplicaHtml,fptr);
-
-    fprintf(fptr,"\n        </ul>\n    </body>\n</html>");
-    fclose(fptr);
-    
-
+    fprintf(tagsFile, "</table>\n</body>\n</html>");
+    fclose(tagsFile);
 
     return 0;
 }

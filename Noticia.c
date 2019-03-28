@@ -28,6 +28,8 @@ void addCategory(Noticia x, char *category);
 void printNoticia(Noticia x);
 void printTag(Tag x);
 void increment(Tag n);
+int getTagRep(Tag n);
+
 char* getId(Noticia x);
 char* getTitle(Noticia x);
 char* getCategory(Noticia x);
@@ -36,23 +38,10 @@ int getNumTags(Noticia x);
 char** getTags(Noticia x);
 char* getTxt(Noticia x);
 
-//FALTAM FAZER
-char* getId(Noticia x);
-char* getTitle(Noticia x);
-char* getDate(Noticia x);
-char** getTag(Noticia x);
-char* getCategory(Noticia x);
-char* getTxt(Noticia x);
-
-
-
-
-
-
 //Implementação
 Noticia initNoticia(){
     Noticia n = malloc(sizeof(struct noticia));
-    n->tags = malloc(sizeof(char*)*1024);
+    n->tags = calloc(200, sizeof(char*));
     n->lenght_tags=0;
     n->title = NULL;
     n->date = NULL;
@@ -71,6 +60,10 @@ Tag initTag(char *name){
 
 void increment(Tag n){
     n->rept++;
+}
+
+int getTagRep(Tag n){
+    return n->rept;
 }
 
 void addId(Noticia x,char *t){
@@ -123,7 +116,7 @@ void printNoticia(Noticia x){
     }
     //imprime txt
     if(x->text){
-        printf("Texte: %s\n",x->text);
+        printf("Text: %s\n",x->text);
     }
 }
 
