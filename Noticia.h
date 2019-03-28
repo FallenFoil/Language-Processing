@@ -28,5 +28,7 @@ char* getDate(Noticia x);
 int getNumTags(Noticia x);
 char** getTags(Noticia x);
 char* getTxt(Noticia x);
+void TagBelongsNoticia(Tag n, char *noticia);
+char* getTag(Noticia x,int index);
 
 #endif

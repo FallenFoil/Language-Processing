@@ -15,9 +15,8 @@ char txt[100*MB] ;
 FILE *out;
 
 GHashTable *tags;
-GList *noticias;
+GHashTable *noticias;
 Noticia x;
-Tag aux;
 char *tag;
 char tagBuffer[1500];
 int bufferLength;
@@ -37,7 +36,9 @@ int bufferLength;
 
 \<pub\>                         { x = initNoticia();  BEGIN ARTIGO; }
 
-<ARTIGO>"</pub>"                { noticias = g_list_append(noticias, x); BEGIN INITIAL; }
+<ARTIGO>"</pub>"                { if(getId(x)) g_hash_table_insert(noticias,getId(x),x);
+                                 else g_hash_table_insert(noticias,"Sem titulo",x);
+                                BEGIN INITIAL;}
 <ARTIGO>#TAG:                   { BEGIN TAGS; }
 <ARTIGO>#DATE:                  { BEGIN DATE; }
 <ARTIGO>#ID:\{					{ BEGIN ID; }
@@ -49,22 +50,11 @@ int bufferLength;
 <TAG>"}"[ \n]                   { tagBuffer[bufferLength++]='\0';
                                   tag = strdup(tagBuffer);
                                   addTag(x,tag);
-                                  gpointer find = g_hash_table_lookup(tags,tag);
-
-                                  if(!find){
-                                      Tag n = initTag(tag);
-                                      g_hash_table_insert(tags,tag,n);
-                                  }
-                                  else{
-                                      Tag n = (Tag) find;
-                                      increment(n);
-                                      g_hash_table_insert(tags,tag,n);
-                                  }
                                   BEGIN TAGS; 
                                 }
 <TAG>.                          { tagBuffer[bufferLength++]=yytext[0]; }
 
-<ID>"post-"[0-9]+               { yytext[yyleng]='\0'; char* str=strdup(yytext); addId(x,str); }
+<ID>"post-"[0-9]+               { yytext[yyleng]='\0'; char* str=strdup(yytext); addId(x,str);}
 <ID>(\n)                        { BEGIN CATEGORY; }
 <ID>.                           { ; }
 
@@ -87,17 +77,30 @@ int yywrap(){
     return 1;
 }
 
-void printList(void * value, void * data){
+void criaTags(void *value,void *data){
     Noticia x = (Noticia) value;
-    printNoticia(x);
+    int i=0;char *tmp;
+    
+    while(i<getNumTags(x)){
+        
+        tmp = strdup(getTag(x,i));
+        gpointer find = g_hash_table_lookup(tags,tmp);
+
+        if(!find){
+            Tag n = initTag(tmp);
+            TagBelongsNoticia(n, getId(x));
+            g_hash_table_insert(tags,tmp,n);
+        }
+            else{
+                Tag n = (Tag) find;
+                TagBelongsNoticia(n, getId(x));
+                g_hash_table_insert(tags,tmp,n);
+            } 
+
+    }
 }
 
-void transverseFunc(void * key, void * value, void * data){
-    Tag aux = (Tag) value;
-    printTag(aux);
-}
-
-void aplicaHtml(void *value, void *data){
+void aplicaHtml(void *key,void *value, void *data){
     Noticia x = (Noticia) value;
     
     fprintf((FILE *) data,"        <li><a href='%s.html'>%s</a></li>\n",getId(x),getTitle(x));
@@ -144,6 +147,7 @@ void tagsNums(gpointer key, gpointer value, gpointer user_data){
 
 int main(int argc, char *argv[]){
     
+    noticias = g_hash_table_new(g_int64_hash, g_int64_equal);
     tags = g_hash_table_new(g_int64_hash, g_int64_equal);
 
     yyin = fopen("folha8.OUT.txt", "r");
@@ -152,8 +156,9 @@ int main(int argc, char *argv[]){
 
     yylex();
 
-    printf("\n\nFim da filtragem\n\n");    
+    printf("\n\nFim da filtragem\n\n");   
 
+    
     //Criação dos ficheiros com as Noticias
     FILE *index = fopen("HTML/Noticias/index.html","w");
     if(index == NULL){
@@ -162,7 +167,7 @@ int main(int argc, char *argv[]){
    	}
     fprintf(index,"<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> NULLticias </title>\n        <meta charset=\"UTF-8\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1%% ; padding-left: 1%%\" >\n      	<ul>");
     
-    g_list_foreach(noticias,aplicaHtml,index);
+    g_hash_table_foreach(noticias,aplicaHtml,index);
 
     fprintf(index,"\n        </ul>\n    </body>\n</html>");
     fclose(index);
@@ -179,6 +184,7 @@ int main(int argc, char *argv[]){
 
     fprintf(tagsFile, "</table>\n</body>\n</html>");
     fclose(tagsFile);
+    
 
     return 0;
 }

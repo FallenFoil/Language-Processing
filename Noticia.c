@@ -15,6 +15,7 @@ typedef struct noticia{
 typedef struct tag{   
     char *tag;//tag
     int rept;//contador
+    char **id_noticia;//noticias que contêm esta tag
 }* Tag;
 
 //Funções públicas
@@ -27,7 +28,7 @@ void addTxt(Noticia x, char *txt);
 void addCategory(Noticia x, char *category);
 void printNoticia(Noticia x);
 void printTag(Tag x);
-void increment(Tag n);
+void TagBelongsNoticia(Tag n, char *noticia);
 int getTagRep(Tag n);
 
 char* getId(Noticia x);
@@ -37,6 +38,7 @@ char* getDate(Noticia x);
 int getNumTags(Noticia x);
 char** getTags(Noticia x);
 char* getTxt(Noticia x);
+char* getTag(Noticia x,int index);
 
 //Implementação
 Noticia initNoticia(){
@@ -54,11 +56,14 @@ Noticia initNoticia(){
 Tag initTag(char *name){
     Tag n = malloc(sizeof(struct tag));
     n->tag = strdup(name);
-    n->rept=1;
+    n->id_noticia= calloc(1024,sizeof(char*));
+    n->rept=0;
     return n;
 }
 
-void increment(Tag n){
+//noticia adicionada ao conjunto de tags
+void TagBelongsNoticia(Tag n, char *noticia){
+    n->id_noticia[n->rept] = strdup(noticia);
     n->rept++;
 }
 
@@ -151,6 +156,10 @@ char* getDate(Noticia x){
 
 int getNumTags(Noticia x){
     return x->lenght_tags;
+}
+
+char* getTag(Noticia x,int index){
+    return x->tags[index];
 }
 
 char** getTags(Noticia x){
