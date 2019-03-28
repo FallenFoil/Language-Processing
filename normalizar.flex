@@ -77,26 +77,29 @@ int yywrap(){
     return 1;
 }
 
-void criaTags(void *value,void *data){
+void criaTags(void *key,void *value,void *data){
     Noticia x = (Noticia) value;
     int i=0;char *tmp;
     
     while(i<getNumTags(x)){
         
         tmp = strdup(getTag(x,i));
-        gpointer find = g_hash_table_lookup(tags,tmp);
+        if(tmp!=NULL){
+            gpointer find = g_hash_table_lookup(tags,tmp);
 
-        if(!find){
-            Tag n = initTag(tmp);
-            TagBelongsNoticia(n, getId(x));
-            g_hash_table_insert(tags,tmp,n);
-        }
-            else{
-                Tag n = (Tag) find;
+            if(!find){
+                Tag n = initTag(tmp);
                 TagBelongsNoticia(n, getId(x));
                 g_hash_table_insert(tags,tmp,n);
-            } 
+            }
+                else{
+                    Tag n = (Tag) find;
+                    TagBelongsNoticia(n, getId(x));
+                    g_hash_table_insert(tags,tmp,n);
+                } 
 
+        }
+        i++;
     }
 }
 
@@ -150,14 +153,16 @@ int main(int argc, char *argv[]){
     noticias = g_hash_table_new(g_int64_hash, g_int64_equal);
     tags = g_hash_table_new(g_int64_hash, g_int64_equal);
 
-    yyin = fopen("folha8.OUT.txt", "r");
+    //yyin = fopen("folha8.OUT.txt", "r");
 
     printf("Inicio da filtragem\n");
 
     yylex();
 
+    
     printf("\n\nFim da filtragem\n\n");   
 
+    g_hash_table_foreach(noticias,criaTags,NULL);
     
     //Criação dos ficheiros com as Noticias
     FILE *index = fopen("HTML/Noticias/index.html","w");
@@ -180,6 +185,7 @@ int main(int argc, char *argv[]){
    	}
     fprintf(tagsFile, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title> Tags </title>\n        <meta charset=\"UTF-8\">\n        <meta name=\"description\" content=\"Ocorrencias de tags\">\n        <meta name=\"keywords\" content=\"Tags,Ocorrencias de Tags\">\n        <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n    </head>\n\n    <body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1%% ; padding-left: 1%%\" >\n        <table> \n        	<tr> <th>Tag</th> <th>Number of repetitions </th> </tr>");
     
+
     g_hash_table_foreach(tags, tagsNums, tagsFile);
 
     fprintf(tagsFile, "</table>\n</body>\n</html>");

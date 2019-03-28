@@ -132,6 +132,11 @@ void printTag(Tag x){
     }
     //imprime o numero de repeticoes
     printf(" %d\n",x->rept);
+    
+    while(x->rept>0){
+        printf("%s\n",x->id_noticia[x->rept]);
+        x->rept--;
+    }
 }
 
 
