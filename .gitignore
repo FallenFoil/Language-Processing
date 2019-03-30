@@ -5,3 +5,5 @@ program
 HTML/Noticias/*
 HTML/Tags/*
 .vscode
+!HTML/Noticias/NaoIgnora.txt
+!HTML/Tags/NaoIgnora.txt
