@@ -24,7 +24,8 @@ Tag initTag(char *name);
 void addTitle(Noticia x, char *title);
 void addDate(Noticia x, char *date);
 void addTag(Noticia x,char *tag);
-void addTxt(Noticia x, char *txt);
+void addTxt(Noticia x, char *txt, int n);
+void endText(Noticia x);
 void addCategory(Noticia x, char *category);
 void printNoticia(Noticia x);
 void printTag(Tag x);
@@ -48,7 +49,7 @@ Noticia initNoticia(){
     n->lenght_tags=0;
     n->title = NULL;
     n->date = NULL;
-    n->text = NULL;
+    n->text = strdup(" ");
     n->id = NULL;
 
     return n;
@@ -88,8 +89,13 @@ void addDate(Noticia x,char *t){
     x->date = strdup(t);
 }
 
-void addTxt(Noticia x,char *t){
-    x->text = strdup(t);
+void addTxt(Noticia x,char *t, int n){
+    x->text = (char*) realloc(x->text, (strlen(x->text) + strlen(t))  * sizeof(char*));
+    x->text = strncat(x->text, t, n);
+}
+
+void endText(Noticia x){
+    x->text[strlen(x->text)]='\0';
 }
 
 void addCategory(Noticia x,char *t){
