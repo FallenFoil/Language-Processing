@@ -28,8 +28,9 @@ void addTxt(Noticia x, char *txt);
 void addCategory(Noticia x, char *category);
 void printNoticia(Noticia x);
 void printTag(Tag x);
-void TagBelongsNoticia(Tag n, char *noticia);
+void tagBelongsNoticia(Tag n, char *noticia);
 int getTagRep(Tag n);
+char* getIdNoticia(Tag n, int i);
 
 char* getId(Noticia x);
 char* getTitle(Noticia x);
@@ -43,7 +44,7 @@ char* getTag(Noticia x,int index);
 //Implementação
 Noticia initNoticia(){
     Noticia n = malloc(sizeof(struct noticia));
-    n->tags = calloc(200, sizeof(char*));
+    n->tags = malloc(200*sizeof(char*));
     n->lenght_tags=0;
     n->title = NULL;
     n->date = NULL;
@@ -56,19 +57,23 @@ Noticia initNoticia(){
 Tag initTag(char *name){
     Tag n = malloc(sizeof(struct tag));
     n->tag = strdup(name);
-    n->id_noticia= calloc(1024,sizeof(char*));
+    n->id_noticia= malloc(1024*10*sizeof(char*));
     n->rept=0;
     return n;
 }
 
 //noticia adicionada ao conjunto de tags
-void TagBelongsNoticia(Tag n, char *noticia){
+void tagBelongsNoticia(Tag n, char *noticia){
     n->id_noticia[n->rept] = strdup(noticia);
     n->rept++;
 }
 
 int getTagRep(Tag n){
     return n->rept;
+}
+
+char* getIdNoticia(Tag n, int i){
+    return n->id_noticia[i];
 }
 
 void addId(Noticia x,char *t){
