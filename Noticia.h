@@ -9,28 +9,30 @@
 typedef struct noticia *Noticia;
 typedef struct tag *Tag;
 
-Noticia initNoticia();//inicializa a noticia
-Tag initTag(char *name);
-void increment(Tag n);
-int getTagRep(Tag n);
-void addId(Noticia x, char *Id);//adiciona um id á noticia
-void addTitle(Noticia x, char *title);//adiciona um titulo á noticia
-void addDate(Noticia x, char *date);//adiciona uma data á noticia
-void addTag(Noticia x,char *tag);//adiciona uma tag á noticia
-void addTxt(Noticia x, char *txt, int n);//adiciona o texto á noticia
+//Noticia
+Noticia initNoticia();
+void addId(Noticia x, char *Id);
+void addTitle(Noticia x, char *title);
+void addDate(Noticia x, char *date);
+void addTag(Noticia x,char *tag);
+void addTxt(Noticia x, char *txt, int n);
 void endText(Noticia x);
-void addCategory(Noticia x, char *category);//adiciona uma categoria á noticia
-void printNoticia(Noticia x);//imprime toda a informação de uma determinada noticia
-void printTag(Tag x);
-char* getId(Noticia x);//devolve o id de uma noticia
+void addCategory(Noticia x, char *category);
+char* getId(Noticia x);
 char* getTitle(Noticia x);
 char* getCategory(Noticia x);
 char* getDate(Noticia x);
 int getNumTags(Noticia x);
+char* getTag(Noticia x,int index);
 char** getTags(Noticia x);
 char* getTxt(Noticia x);
+void printNoticia(Noticia x);
+
+//Tag
+Tag initTag(char *name);
 void tagBelongsNoticia(Tag n, char *noticia);
-char* getTag(Noticia x,int index);
+int getTagRep(Tag n);
 char* getIdNoticia(Tag n, int i);
+void printTag(Tag x);
 
 #endif

@@ -65,7 +65,7 @@ int semId = 0;
 <CATEGORY>("\n\n")              { BEGIN TITLE; }
 
 <TITLE>.*                       { yytext[yyleng]='\0'; addTitle(x,strdup(yytext)); }
-<TITLE>(\n)                     { BEGIN ARTIGO; }
+<TITLE>(\n)                     { BEGIN ARTIGO; }	
 
 <DATE>(\n)                      { BEGIN TEXT; }
 <DATE>.*                        { yytext[yyleng]='\0'; addDate(x,yytext+9); }
@@ -75,7 +75,6 @@ int semId = 0;
 
 (.|\n)                          { }
 %%
-
 
 int yywrap(){
     return 1;
@@ -152,8 +151,7 @@ void verifyTagName(char* tagFileName){
 
 void tagsHTML(gpointer key, gpointer value, gpointer user_data){
     Tag t = (Tag) value;
-    fprintf((FILE*) user_data, "\t\t\t<tr> <td> <a href=\"%s.html\">%s</a> </td> <td> %d </td> </tr>\n", (char*) key, (char*) key, getTagRep(t));
-    
+
     char* tagname = strdup((char*) key);
     verifyTagName(tagname);
 
@@ -161,6 +159,8 @@ void tagsHTML(gpointer key, gpointer value, gpointer user_data){
     strcpy(tagFileName, "HTML/Tags/");
     strcat(tagFileName, tagname);
     strcat(tagFileName, ".html");
+
+    fprintf((FILE*) user_data, "\t\t\t<tr> <td> <a href=\"%s.html\">%s</a> </td> <td> %d </td> </tr>\n", tagname, (char*) key, getTagRep(t));
 
     FILE* tagFile = fopen(tagFileName, "w");
     if(tagFile == NULL){
@@ -202,7 +202,7 @@ int main(int argc, char *argv[]){
     //Criação dos ficheiros com as Noticias
     FILE *index = fopen("HTML/Noticias/index.html","w");
     if(index == NULL){
-        printf("Erro ao criar o ficheiro HTML com as noticias");
+        printf("Erro ao criar o ficheiro HTML com as noticias\n");
     }
     else{
         fprintf(index,"<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<title> NULLticias </title>\n\t\t<meta charset=\"UTF-8\">\n\t\t<link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n\t</head>\n\n\t<body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(200, 200, 200);padding-right: 1%% ; padding-left: 1%%\">\n\t\t<ul>");
