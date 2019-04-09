@@ -23,5 +23,6 @@
 ## Relatório – Overleaf
 
 * **TP1:** https://www.overleaf.com/2944695187gpvkgysxckck
+* **TP2:** https://www.overleaf.com/8338276838hvqjmtbcpnrd
 
 <!-- ----------------------------------------------------------------------- -->
