@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -f
 
-BEGIN					{ FS="[ ]+|([ ]+[-]+)+([ ])?"; RS="\n"; }
+BEGIN					{ FS="[ ]+(-[ ])*"; RS="- - - -(\n)+"; n=0 }
 
 NF==8 { if($5 == "NP") nomesProprios[$2]++;
 		switch(getPos($6)){
@@ -11,20 +11,14 @@ NF==8 { if($5 == "NP") nomesProprios[$2]++;
 			default: break;
 		};
 		dicionario[$2" "getPos($6)" "$3]
-		#lemas[$3] = getPos($6)
-		#pos[getPos($6)] = $2
-		#palavra[$2];
 	  }
-NF!=8 {}	  
+NF != 8 && NR <= 10 {print $0, n++, "("NF")"}
 
 END						{ 
-						  createIndexHTML();	
 						  print "-------------------\nNUMERO REGISTOS/EXTRATOS\n-------------------"
-						  print NR; 
-						  print "-------------------\nPERSONAGENS/NOMES_PROPRIOS\n-------------------"
-						  
-						  #PROCINFO["sorted_in"] = "cmp_num_val";
-						  #for(pers in nomesProprios) print pers, "-" , nomesProprios[pers];
+						  print NR, n	
+						  createIndexHTML();	
+						  createPersonagensHTML()
 						  createVerbosHTML()
 						  createNomesHTML()
 						  createAdverbiosHTML()
@@ -39,7 +33,7 @@ function getPos(carateristicas){
 	return pos[2];
 }
 
-function cmp_num_cal(i1, v1, i2, v2){
+function cmp_num_val(i1, v1, i2, v2){
     return (v2 - v1);
 }
 
@@ -57,8 +51,22 @@ function createIndexHTML(){
 	print "<h1> <a href=\"./nomes.html\"> Nomes </a></h1>" > file
 	print "<h1> <a href=\"./adverbios.html\"> Adverbios </a></h1>" > file
 	print "<h1> <a href=\"./adjetivos.html\"> Adjetivos </a></h1>" > file
+	print "<h1> <a href=\"./personagens.html\"> Personagens </a></h1>" > file
+	print "<h1> <a href=\"./dicionario.html\"> Dicionario </a></h1>" > file
+	print "<h1> Numero de registos: "NR"</h1>" > file
 
 	END_HTML(file);
+}
+
+function createPersonagensHTML(){
+	file = "./html/personagens.html"
+	BEGIN_HTML(file)
+
+	PROCINFO["sorted_in"] = "cmp_num_val"
+	for(pers in nomesProprios) 
+		print "<h1>" pers, "-" , nomesProprios[pers] "</h1>" > file
+
+	END_HTML(file)
 }
 
 function createVerbosHTML(){
