@@ -10,6 +10,7 @@ NF==8 { if($5 == "NP") nomesProprios[$2]++;
 			case "adjective": adjetivos[$2]; break;
 			default: break;
 		};
+		dicionario[$2" "getPos($6)" "$3]
 		#lemas[$3] = getPos($6)
 		#pos[getPos($6)] = $2
 		#palavra[$2];
@@ -21,19 +22,16 @@ END						{
 						  print "-------------------\nNUMERO REGISTOS/EXTRATOS\n-------------------"
 						  print NR; 
 						  print "-------------------\nPERSONAGENS/NOMES_PROPRIOS\n-------------------"
-						  #for(lema in lemas)
-						  	
-						  		#print pos;
-						  		#for(palavra in dicionario[lema][pos])
-						  		#print "Lema, pos, palavra:" lema, pos, palavra 
 						  
-						  PROCINFO["sorted_in"] = "cmp_num_val";
-						  for(pers in nomesProprios) print pers, "-" , nomesProprios[pers];
+						  #PROCINFO["sorted_in"] = "cmp_num_val";
+						  #for(pers in nomesProprios) print pers, "-" , nomesProprios[pers];
 						  createVerbosHTML()
 						  createNomesHTML()
 						  createAdverbiosHTML()
 						  createAdjetivosHTML()
+						  createDicionarioHTML()
 						}
+
 
 function getPos(carateristicas){
 	split(carateristicas, car, "|");
@@ -41,13 +39,13 @@ function getPos(carateristicas){
 	return pos[2];
 }
 
-function cmp_num_val(i1, v1, i2, v2){
+function cmp_num_cal(i1, v1, i2, v2){
     return (v2 - v1);
 }
 
-function cmp_str_val(i1, v1, i2, v2){
-	if(v1 > v2) return 1;
-	if(v1 < v2) return -1;
+function cmp_str_ind(i1, v1, i2, v2){
+	if(i1 > i2) return 1;
+	if(i1 < i2) return -1;
 	return 0;
 }
 
@@ -68,7 +66,7 @@ function createVerbosHTML(){
 	BEGIN_HTML(file)
 
 	print "<h1>Verbos :</h1></br>" > file
-	PROCINFO["sorted_in"] = "cmp_str_val"
+	PROCINFO["sorted_in"] = "cmp_str_ind"
 	for(verb in verbos){
 		print "<h1>"verb"</h1>" > file
 	}
@@ -81,7 +79,7 @@ function createNomesHTML(){
 	BEGIN_HTML(file)
 
 	print "<h1>Verbos :</h1></br>" > file
-	PROCINFO["sorted_in"] = "cmp_str_val"
+	PROCINFO["sorted_in"] = "cmp_str_ind"
 	for(nome in nomes){
 		print "<h1>"nome"</h1>" > file
 	}
@@ -94,7 +92,7 @@ function createAdverbiosHTML(){
 	BEGIN_HTML(file)
 
 	print "<h1>Adverbios :</h1></br>" > file
-	PROCINFO["sorted_in"] = "cmp_str_val"
+	PROCINFO["sorted_in"] = "cmp_str_ind"
 	for(adv in adverbios){
 		print "<h1>"adv"</h1>" > file
 	}
@@ -107,7 +105,7 @@ function createAdjetivosHTML(){
 	BEGIN_HTML(file)
 
 	print "<h1>Verbos :</h1></br>" > file
-	PROCINFO["sorted_in"] = "cmp_str_val"
+	PROCINFO["sorted_in"] = "cmp_str_ind"
 	for(adj in adjetivos){
 		print "<h1>"adj"</h1>" > file
 	}
@@ -115,7 +113,25 @@ function createAdjetivosHTML(){
 	END_HTML(file)
 }
 
+function createDicionarioHTML(){
+	file = "./html/dicionario.html"
+	BEGIN_HTML(file)
 
+	firstChar = "aaa"
+	PROCINFO["sorted_in"] = "cmp_str_ind"
+	for(dic in dicionario){
+			if(firstChar != substr(dic,0,1)){
+			print substr(dic,0,1)
+			firstChar = substr(dic,0,1)
+			if(firstChar == "\"") firstChar = "aspas"
+			wordsFile = "./html/dicionario/"firstChar".html"
+			print "<h1> <a href=\"./dicionario/"firstChar".html\">" firstChar "</a></h1>" > file	
+		}
+		print "<h1>" dic "</h1>" > wordsFile
+	}
+
+	END_HTML(file)
+}
 
 function BEGIN_HTML(file){
 	print "<head> <meta charset="UTF-8"> </head> <body>" > file
