@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -f
 
-BEGIN					{ FS="[ ]+(-[ ])*"; RS="- - - -(\n)+"; n=0 }
+BEGIN					{ FS="[ ]+((-[ ]){2,})?"; RS="- - - -(\n)+"; n=0 }
 
 NF==8 { if($5 == "NP") nomesProprios[$2]++;
 		switch(getPos($6)){
@@ -12,11 +12,20 @@ NF==8 { if($5 == "NP") nomesProprios[$2]++;
 		};
 		dicionario[$2" "getPos($6)" "$3]
 	  }
-NF != 8 && NR <= 10 {print $0, n++, "("NF")"}
+NF == 6 {
+		switch(getGroup($4)){
+			case "verb": verbos[$2]; break;
+			case "noun": nomes[$2]; break;
+			case "adverb": adverbios[$2]; break;
+			case "adjective": adjetivos[$2]; break;
+			default: break;
+		}
+		dicionario[$2" "getGroup($4)" "$3]
+		}
+NF != 6 && NF != 8 {n++; print $0}		
 
 END						{ 
-						  print "-------------------\nNUMERO REGISTOS/EXTRATOS\n-------------------"
-						  print NR, n	
+						  print "numero de registos não filtrados: ", n
 						  createIndexHTML();	
 						  createPersonagensHTML()
 						  createVerbosHTML()
@@ -26,6 +35,24 @@ END						{
 						  createDicionarioHTML()
 						}
 
+function getGroup(sigla){
+	firstChar = substr(sigla, 0, 1)
+	switch(firstChar){
+		case "N" : return "noun";
+		case "V" : return "verb";
+		case "R" : return "adverb";
+		case "A" : return "adjective";
+		case "F" : return "punctuation";
+		case "W" : return "date";
+		case "S" : return "adposition";
+		case "D" : return "determiner";
+		case "C" : return "conjunction";
+		case "Z" : return "number";
+		case "P" : return "pronoun";
+		case "I" : return "interjection";
+		default : print firstChar, sigla;
+	}
+}
 
 function getPos(carateristicas){
 	split(carateristicas, car, "|");
@@ -86,7 +113,7 @@ function createNomesHTML(){
 	file = "./html/nomes.html"
 	BEGIN_HTML(file)
 
-	print "<h1>Verbos :</h1></br>" > file
+	print "<h1>Nomes :</h1></br>" > file
 	PROCINFO["sorted_in"] = "cmp_str_ind"
 	for(nome in nomes){
 		print "<h1>"nome"</h1>" > file
@@ -112,7 +139,7 @@ function createAdjetivosHTML(){
 	file = "./html/adjetivos.html"
 	BEGIN_HTML(file)
 
-	print "<h1>Verbos :</h1></br>" > file
+	print "<h1>Adjetivos :</h1></br>" > file
 	PROCINFO["sorted_in"] = "cmp_str_ind"
 	for(adj in adjetivos){
 		print "<h1>"adj"</h1>" > file
@@ -129,7 +156,6 @@ function createDicionarioHTML(){
 	PROCINFO["sorted_in"] = "cmp_str_ind"
 	for(dic in dicionario){
 			if(firstChar != substr(dic,0,1)){
-			print substr(dic,0,1)
 			firstChar = substr(dic,0,1)
 			if(firstChar == "\"") firstChar = "aspas"
 			wordsFile = "./html/dicionario/"firstChar".html"
