@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -f
 
-BEGIN					{ FS="[ ]+((-[ ]){2,})?"; RS="- - - -(\n)+"; n=0 }
+BEGIN					{ FS="[ ]+((-[ ]){2,})?"; RS="(- - - -\n)|\n"; n=0; extratos = 0}
 
 NF==8 { if($5 == "NP") nomesProprios[$2]++;
 		switch(getPos($6)){
@@ -12,6 +12,7 @@ NF==8 { if($5 == "NP") nomesProprios[$2]++;
 		};
 		dicionario[$2" "getPos($6)" "$3]
 	  }
+#Apenas usado no ficheiro fl0
 NF == 6 {
 		switch(getGroup($4)){
 			case "verb": verbos[$2]; break;
@@ -22,7 +23,14 @@ NF == 6 {
 		}
 		dicionario[$2" "getGroup($4)" "$3]
 		}
-NF != 6 && NF != 8 {n++; print $0}		
+#Caso encontre um registo não previsto	
+NF != 6 && NF != 8 && NF != 0 {n++; print $0}	
+
+#Quando existe um registo 
+NF > 0 {printf "%s ", $2 >> "./html/"getCurrentFileName()".html"}
+
+#Quando existe uma mudança de Extrato
+NF == 0 {extratos ++}
 
 END						{ 
 						  print "numero de registos não filtrados: ", n
@@ -59,6 +67,11 @@ function getPos(carateristicas){
 	split(car[1], pos, "=");
 	return pos[2];
 }
+function getCurrentFileName() {
+	fileName = FILENAME;
+    gsub(".*/", "", fileName);
+    return fileName;
+  }
 
 function cmp_num_val(i1, v1, i2, v2){
     return (v2 - v1);
@@ -80,7 +93,7 @@ function createIndexHTML(){
 	print "<h1> <a href=\"./adjetivos.html\"> Adjetivos </a></h1>" > file
 	print "<h1> <a href=\"./personagens.html\"> Personagens </a></h1>" > file
 	print "<h1> <a href=\"./dicionario.html\"> Dicionario </a></h1>" > file
-	print "<h1> Numero de registos: "NR"</h1>" > file
+	print "<h1> Numero de extratos: "extratos"</h1>" > file
 
 	END_HTML(file);
 }
