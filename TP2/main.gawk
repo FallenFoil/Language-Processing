@@ -84,7 +84,7 @@ function cmp_str_ind(i1, v1, i2, v2){
 	return 0;
 }
 
-function cmp_str_lema(i1, v1, i2, v2){
+function cmp_str_partOfSpeech(i1, v1, i2, v2){
 	split(i1, lema1, " ")
 	split(i2, lema2, " ")
 	if(lema1[2] > lema2[2]) return 1;
@@ -102,6 +102,7 @@ function createIndexHTML(){
 	print "<h1> <a href=\"./adjetivos.html\"> Adjetivos </a></h1>" > file
 	print "<h1> <a href=\"./personagens.html\"> Personagens </a></h1>" > file
 	print "<h1> <a href=\"./dicionario.html\"> Dicionario </a></h1>" > file
+	print "<h1> <a href=\"./partOfSpeech.html\"> Part of Speech </a></h1>" > file
 	print "<h1> Numero de extratos: "extratos"</h1>" > file
 
 	END_HTML(file);
@@ -190,26 +191,26 @@ function createDicionarioHTML(){
 }
 
 function createReverseDicionarioHTML(){
-	file = "./html/lemas.html"
+	file = "./html/partOfSpeech.html"
 	BEGIN_HTML(file)
 
 	currentLema = ""
-	PROCINFO["sorted_in"] = "cmp_str_lema"
+	PROCINFO["sorted_in"] = "cmp_str_partOfSpeech"
 	for(dic in dicionario){
-		split(dic, lema, " ")
-		if(currentLema != lema[2]){
-			currentLema = lema[2]
-			print "<h1> <a href=\"./lemas/"currentLema".html\">" currentLema "</a></h1>" > file
+		split(dic, partOfSpeech, " ")
+		if(currentPos != partOfSpeech[2]){
+			currentPos = partOfSpeech[2]
+			print "<h1> <a href=\"./pos/"currentPos".html\">" currentPos "</a></h1>" > file
 		}
-		lemasFile =  "./html/lemas/"currentLema".html"
-		print "<h1>"lema[1]": "lema[3]"</h1>" > lemasFile
+		partOfSpeechFile =  "./html/pos/"currentPos".html"
+		print "<h1>"partOfSpeech[1]": "partOfSpeech[3]"</h1>" > partOfSpeechFile
+		
 	}
-
 	END_HTML(file)
 }
 
 function BEGIN_HTML(file){
-	print "<head> <meta charset="UTF-8"> </head> <body>" > file
+	print "<head> <meta charset=\"UTF-8\"> </head> <body>" > file
 }
 
 function END_HTML(file){
