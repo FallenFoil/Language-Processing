@@ -2,7 +2,7 @@
 
 BEGIN					{ FS="[ ]+((-[ ]){2,})?"; RS="(- - - -\n)|\n"; n=0; extratos = 0}
 
-NF==8 { if($5 == "NP") nomesProprios[$2]++;
+NF==8 { if($5 == "NP" && getCurrentFileName()~"harrypotter.+") nomesProprios[$2]++;
 		switch(getPos($6)){
 			case "verb": verbos[$2]; break;
 			case "noun": nomes[$2]; break;
@@ -41,6 +41,7 @@ END						{
 						  createAdverbiosHTML()
 						  createAdjetivosHTML()
 						  createDicionarioHTML()
+						  createReverseDicionarioHTML()
 						}
 
 function getGroup(sigla){
@@ -80,6 +81,14 @@ function cmp_num_val(i1, v1, i2, v2){
 function cmp_str_ind(i1, v1, i2, v2){
 	if(i1 > i2) return 1;
 	if(i1 < i2) return -1;
+	return 0;
+}
+
+function cmp_str_lema(i1, v1, i2, v2){
+	split(i1, lema1, " ")
+	split(i2, lema2, " ")
+	if(lema1[2] > lema2[2]) return 1;
+	if(lema1[2] < lema2[2]) return -1;
 	return 0;
 }
 
@@ -175,6 +184,25 @@ function createDicionarioHTML(){
 			print "<h1> <a href=\"./dicionario/"firstChar".html\">" firstChar "</a></h1>" > file	
 		}
 		print "<h1>" dic "</h1>" > wordsFile
+	}
+
+	END_HTML(file)
+}
+
+function createReverseDicionarioHTML(){
+	file = "./html/lemas.html"
+	BEGIN_HTML(file)
+
+	currentLema = ""
+	PROCINFO["sorted_in"] = "cmp_str_lema"
+	for(dic in dicionario){
+		split(dic, lema, " ")
+		if(currentLema != lema[2]){
+			currentLema = lema[2]
+			print "<h1> <a href=\"./lemas/"currentLema".html\">" currentLema "</a></h1>" > file
+		}
+		lemasFile =  "./html/lemas/"currentLema".html"
+		print "<h1>"lema[1]": "lema[3]"</h1>" > lemasFile
 	}
 
 	END_HTML(file)
