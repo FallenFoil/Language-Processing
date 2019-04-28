@@ -1,3 +1,7 @@
-exec="gawk -f main.gawk $1"
+mkdir -p html/
+mkdir -p html/pos/
+mkdir -p html/dicionario/
+
+exec="./main.gawk $@"
 echo $exec
 $exec
