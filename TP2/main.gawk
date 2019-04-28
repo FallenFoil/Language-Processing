@@ -26,9 +26,6 @@ NF == 6 {
 #Caso encontre um registo não previsto	
 NF != 6 && NF != 8 && NF != 0 {n++; print $0}	
 
-#Quando existe um registo 
-NF > 0 {printf "%s ", $2 >> "./html/"getCurrentFileName()".html"}
-
 #Quando existe uma mudança de Extrato
 NF == 0 {extratos ++}
 
@@ -94,7 +91,8 @@ function cmp_str_partOfSpeech(i1, v1, i2, v2){
 
 function createIndexHTML(){
 	file = "./html/index.html"
-	BEGIN_HTML(file);
+	title = "Index"
+	BEGIN_HTML(file,title);
 
 	print "<h1> <a href=\"./verbos.html\"> Verbos </a></h1>" > file
 	print "<h1> <a href=\"./nomes.html\"> Nomes </a></h1>" > file
@@ -110,7 +108,8 @@ function createIndexHTML(){
 
 function createPersonagensHTML(){
 	file = "./html/personagens.html"
-	BEGIN_HTML(file)
+	title = "Personagens"
+	BEGIN_HTML(file,title)
 
 	PROCINFO["sorted_in"] = "cmp_num_val"
 	for(pers in nomesProprios) 
@@ -121,7 +120,8 @@ function createPersonagensHTML(){
 
 function createVerbosHTML(){
 	file = "./html/verbos.html"
-	BEGIN_HTML(file)
+	title = "Verbos"
+	BEGIN_HTML(file, title)
 
 	print "<h1>Verbos :</h1></br>" > file
 	PROCINFO["sorted_in"] = "cmp_str_ind"
@@ -134,7 +134,8 @@ function createVerbosHTML(){
 
 function createNomesHTML(){
 	file = "./html/nomes.html"
-	BEGIN_HTML(file)
+	title = "Nomes"
+	BEGIN_HTML(file,title)
 
 	print "<h1>Nomes :</h1></br>" > file
 	PROCINFO["sorted_in"] = "cmp_str_ind"
@@ -147,7 +148,8 @@ function createNomesHTML(){
 
 function createAdverbiosHTML(){
 	file = "./html/adverbios.html"
-	BEGIN_HTML(file)
+	title = "Adverbios"
+	BEGIN_HTML(file,title)
 
 	print "<h1>Adverbios :</h1></br>" > file
 	PROCINFO["sorted_in"] = "cmp_str_ind"
@@ -160,7 +162,8 @@ function createAdverbiosHTML(){
 
 function createAdjetivosHTML(){
 	file = "./html/adjetivos.html"
-	BEGIN_HTML(file)
+	title = "Adjetivos"
+	BEGIN_HTML(file,title)
 
 	print "<h1>Adjetivos :</h1></br>" > file
 	PROCINFO["sorted_in"] = "cmp_str_ind"
@@ -173,7 +176,8 @@ function createAdjetivosHTML(){
 
 function createDicionarioHTML(){
 	file = "./html/dicionario.html"
-	BEGIN_HTML(file)
+	title = "Dicionario"
+	BEGIN_HTML(file,title)
 
 	firstChar = "aaa"
 	PROCINFO["sorted_in"] = "cmp_str_ind"
@@ -192,7 +196,8 @@ function createDicionarioHTML(){
 
 function createReverseDicionarioHTML(){
 	file = "./html/partOfSpeech.html"
-	BEGIN_HTML(file)
+	title = "PartOfSpeech"
+	BEGIN_HTML(file,title)
 
 	currentLema = ""
 	PROCINFO["sorted_in"] = "cmp_str_partOfSpeech"
@@ -209,10 +214,14 @@ function createReverseDicionarioHTML(){
 	END_HTML(file)
 }
 
-function BEGIN_HTML(file){
-	print "<head> <meta charset=\"UTF-8\"> </head> <body>" > file
+function BEGIN_HTML(file, title){
+	print "<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<title>" > file
+	print title > file
+	print "</title>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta name=\"description\" content=\"" > file
+	print title > file
+	print "\">\n\t\t<link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n\t</head>\n\t<body style=\"font-family: 'Montserrat', sans-serif;background-color: rgb(230, 230, 230);padding-right: 1%;padding-left: 1%\" >\n" > file
 }
 
 function END_HTML(file){
-	print "</body>" > file
+	print "\n\t</body>\n</html>" > file
 }
