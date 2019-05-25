@@ -1,0 +1,13 @@
+%option noyywrap
+
+%x OPTIONS
+
+%%
+
+\% {BEGIN OPTIONS;}
+[ \t\n] { }
+<OPTIONS>[a-z]+	{yylval.string = strdup(yytext); return OPT;}
+<OPTIONS>[A-Z]+				{yylval.string = strdup(yytext); return ARG;}
+<OPTIONS>[ ] 				{ }
+<OPTIONS>\n 				{ }
+%%
