@@ -1,13 +1,20 @@
 %option noyywrap
 
-%x OPTIONS
+%x OPTIONS COMENTARIO CONCEITOS
 
 %%
 
 \% {BEGIN OPTIONS;}
-[ \t\n] { }
-<OPTIONS>[a-z]+	{yylval.string = strdup(yytext); return OPT;}
+\# {BEGIN COMENTARIO;}
+[ \t\n]	 					{ }
+<OPTIONS>[a-z]+				{yylval.string = strdup(yytext); return OPT;}
 <OPTIONS>[A-Z]+				{yylval.string = strdup(yytext); return ARG;}
-<OPTIONS>[ ] 				{ }
-<OPTIONS>\n 				{ }
+<OPTIONS>\n 				{BEGIN 0; return yytext[0];}
+<COMENTARIO>.				{ }
+<COMENTARIO>\n 				{BEGIN 0;}
+<CONCEITOS>[a-z]			{yylval.string = strdup(yytext); return CONCEITO;}
+<CONCEITOS>[A-Z]			{yylval.string = strdup(yytext); return ARG;}
+<CONCEITOS>[,\n]			{return yytext[0];}
+<CONCEITOS>.				{ }
+<*>. 						{ }
 %%

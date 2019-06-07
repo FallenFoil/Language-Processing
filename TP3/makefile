@@ -1,7 +1,14 @@
-notas: thesaurus.fl thesaurus.y
+# compiler flags:
+  #  -g    adds debugging information to the executable file
+  #  -Wall turns on most, but not all, compiler warnings
+CFLAGS  = -g -Wall `pkg-config --cflags glib-2.0`
+LIBS = `pkg-config --libs glib-2.0`
+
+
+thesaurus: thesaurus.fl thesaurus.y
 	flex thesaurus.fl
 	yacc thesaurus.y
-	cc -o thesaurus_2788 y.tab.c -ly -lm
+	cc $(CFLAGS) -o thesaurus_2788 y.tab.c -ly -lm $(LIBS)
 
 clean:
 	rm -f y.tab.c lex.yy.c thesaurus_2788
