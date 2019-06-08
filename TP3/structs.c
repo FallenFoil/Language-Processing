@@ -40,6 +40,9 @@ void printConceito(Conceito *conceito, FILE *file){
 }
 /////////////////////////////// HTML ///////////////////////////////
 
+void initConceitos(){
+	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
+}
 
 Conceito* getConceito(char* concName, GHashTable *conceitos){
 	return (Conceito *) g_hash_table_lookup(conceitos, concName);

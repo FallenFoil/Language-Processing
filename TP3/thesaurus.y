@@ -52,10 +52,10 @@ int main(){
 	#if YYDEBUG
         yydebug = 1;
     #endif
-	
 	initConceitos();
    	printf("Iniciar parse\n");
    	yyparse();
    	printf("Fim de parse\n");
+   	createHTML();
    	return 0;
 }
