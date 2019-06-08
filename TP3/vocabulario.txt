@@ -5,9 +5,9 @@ animal
 PT animal			
 NT cat, dog, cow
 NT camel
-BT Life being 	
+BT Life being
 
 cat
-PT gato
-BT animal
+PT gato   
+BT animal   
 SN animal que tem sete vidas e meia
