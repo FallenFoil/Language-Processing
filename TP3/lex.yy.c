@@ -748,87 +748,87 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 13 "thesaurus.fl"
-{PRINT_DEBUG; BEGIN OPTIONS;}
+{BEGIN OPTIONS;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 14 "thesaurus.fl"
-{PRINT_DEBUG; BEGIN COMENTARIO;}
+{ BEGIN COMENTARIO;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 15 "thesaurus.fl"
-{PRINT_DEBUG; BEGIN CONCEITOS; yylval.string = strdup(yytext); return CONCEITO;}
+{ BEGIN CONCEITOS; yylval.string = strdup(yytext); return CONCEITO;}
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
 #line 16 "thesaurus.fl"
-{PRINT_DEBUG;}
+{}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 18 "thesaurus.fl"
-{PRINT_DEBUG; yylval.string = strdup(yytext); return OPT;}
+{ yylval.string = strdup(yytext); return OPT;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 19 "thesaurus.fl"
-{PRINT_DEBUG; yylval.string = strdup(yytext); return RELATION;}
+{ yylval.string = strdup(yytext); return RELATION;}
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
 #line 20 "thesaurus.fl"
-{PRINT_DEBUG; BEGIN 0;}
+{ BEGIN 0;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 22 "thesaurus.fl"
-{PRINT_DEBUG;}
+{}
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
 #line 23 "thesaurus.fl"
-{PRINT_DEBUG; BEGIN 0;}
+{ BEGIN 0;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 25 "thesaurus.fl"
-{PRINT_DEBUG; yylval.string = strdup(yytext); return TERMO;}
+{ yylval.string = strdup(yytext); return TERMO;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 26 "thesaurus.fl"
-{PRINT_DEBUG; yylval.string = strdup(yytext); return RELATION;}
+{ yylval.string = strdup(yytext); return RELATION;}
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
 #line 27 "thesaurus.fl"
-{PRINT_DEBUG; BEGIN 0;}
+{ BEGIN 0;}
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
 #line 28 "thesaurus.fl"
-{PRINT_DEBUG;}
+{}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 29 "thesaurus.fl"
-{PRINT_DEBUG; return yytext[0];}
+{ return yytext[0];}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 30 "thesaurus.fl"
-{PRINT_DEBUG;}
+{}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 31 "thesaurus.fl"
-{PRINT_DEBUG;}
+{}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP

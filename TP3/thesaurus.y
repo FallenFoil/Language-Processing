@@ -4,10 +4,14 @@
 
  #include <stdio.h>
  #include <glib.h>
- #include "structs.h"
+ #include "structs.c"
  int yyerror(char *s){ fprintf(stderr, "Erro:%s\n", s); return 0;}
  int yylex();
- GHashTable *conceitos;
+ 
+ GHashTable *conceitos; //contem toda a informação
+ GList *terms = NULL;
+ GList *relations = NULL;
+
  Conceito *c;
  Relations *r;
 
@@ -24,7 +28,7 @@
 
 %%
 
-thesaurus: options conceitos											{printf("%s%s\n",$1,$2);}
+thesaurus: options conceitos											{g_hash_table_foreach(conceitos,printConceito,NULL);}//printf("%s%s\n",$1,$2);}
 	;
 
 options: OPT args 														{asprintf(&$$,"%s - %s\n", $1, $2);}
@@ -36,27 +40,37 @@ args: RELATION   														{$$ = $1;}
 	| args RELATION														{asprintf(&$$, "%s%s", $1, $2);}	 	
 	;
 
-conceitos: CONCEITO relations											{//c = newConceito($1);
+conceitos: CONCEITO relations											{ c = newConceito($1,relations);
+																		 addConceito(c,conceitos);
+																		 relations = NULL;
 																		 asprintf(&$$,"%s\n%s\n", $1, $2);}
-
-		 | conceitos CONCEITO relations 								{//c = newConceito($1);
+		 | conceitos CONCEITO relations 								{ c = newConceito($2,relations);
+		 																addConceito(c,conceitos);
+																		 relations = NULL;
 			 															 asprintf(&$$,"%s%s\n%s\n" , $1 , $2 ,$3);}
 	 	 |																{$$ = " ";}
 		 ;
 
-relations: RELATION termos 												{asprintf(&$$, "%s - %s", $1, $2);}					
-		 | relations RELATION termos  									{asprintf(&$$, "%s\n%s - %s", $1, $2 , $3);}
+relations: RELATION termos 												{ r = newRelation($1,terms);
+																		  relations = addRelationTo(r,relations);
+																		  terms = NULL;
+																		 asprintf(&$$, "%s - %s", $1, $2);}					
+		 | relations RELATION termos  									{r = newRelation($2,terms);
+																		 relations = addRelationTo(r,relations);
+																		 terms = NULL;
+			 															 asprintf(&$$, "%s\n%s - %s", $1, $2 , $3);}
 		 ;	
 
-termos: TERMO ',' termos												{asprintf(&$$, "%s,%s", $1, $3);}
-	  | TERMO 															{ $$ = $1;}
+termos: TERMO ',' termos												{ terms = addTermsTo($1,terms);
+																		 asprintf(&$$, "%s,%s", $1, $3);}
+	  | TERMO 															{ terms = addTermsTo($1,terms);
+		  																 $$ = $1;}
 	  ;
 
 
 
 %%
 #include "lex.yy.c"
-#include "structs.h"
 
 int main(){
 	#if YYDEBUG
@@ -64,9 +78,12 @@ int main(){
     #endif
 	
 	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
-	Conceito *c = newConceito("coisas");
-   	//rintf("Iniciar parse\n");
-   	//yyparse();
-   	//printf("Fim de parse\n");
+	
+	//conceitos -> contem toda a informacao do sistema
+	//para confirmar -> g_hash_table_foreach(conceitos,printConceito,NULL);
+	
+   	printf("Iniciar parse\n");
+   	yyparse();
+   	printf("Fim de parse\n");
    	return 0;
 }

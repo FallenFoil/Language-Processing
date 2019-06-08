@@ -89,10 +89,14 @@
 
  #include <stdio.h>
  #include <glib.h>
- #include "structs.h"
+ #include "structs.c"
  int yyerror(char *s){ fprintf(stderr, "Erro:%s\n", s); return 0;}
  int yylex();
- GHashTable *conceitos;
+ 
+ GHashTable *conceitos; //contem toda a informação
+ GList *terms = NULL;
+ GList *relations = NULL;
+
  Conceito *c;
  Relations *r;
 
@@ -118,7 +122,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 15 "thesaurus.y"
+#line 19 "thesaurus.y"
 {
 	char *string;
     //char *option;
@@ -127,7 +131,7 @@ typedef union YYSTYPE
 
 }
 /* Line 193 of yacc.c.  */
-#line 131 "y.tab.c"
+#line 135 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -140,7 +144,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 144 "y.tab.c"
+#line 148 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -426,8 +430,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    27,    27,    30,    31,    32,    35,    36,    39,    42,
-      44,    47,    48,    51,    52
+       0,    31,    31,    34,    35,    36,    39,    40,    43,    47,
+      51,    54,    58,    64,    66
 };
 #endif
 
@@ -1335,75 +1339,87 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 27 "thesaurus.y"
-    {printf("%s%s\n",(yyvsp[(1) - (2)].string),(yyvsp[(2) - (2)].string));}
+#line 31 "thesaurus.y"
+    {g_hash_table_foreach(conceitos,printConceito,NULL);}
     break;
 
   case 3:
-#line 30 "thesaurus.y"
+#line 34 "thesaurus.y"
     {asprintf(&(yyval.string),"%s - %s\n", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
     break;
 
   case 4:
-#line 31 "thesaurus.y"
+#line 35 "thesaurus.y"
     {asprintf(&(yyval.string),"%s - %s\n", (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].string));}
     break;
 
   case 5:
-#line 32 "thesaurus.y"
+#line 36 "thesaurus.y"
     { }
     break;
 
   case 6:
-#line 35 "thesaurus.y"
+#line 39 "thesaurus.y"
     {(yyval.string) = (yyvsp[(1) - (1)].string);}
     break;
 
   case 7:
-#line 36 "thesaurus.y"
+#line 40 "thesaurus.y"
     {asprintf(&(yyval.string), "%s%s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
     break;
 
   case 8:
-#line 39 "thesaurus.y"
-    {//c = newConceito($1);
+#line 43 "thesaurus.y"
+    { c = newConceito((yyvsp[(1) - (2)].string),relations);
+																		 addConceito(c,conceitos);
+																		 relations = NULL;
 																		 asprintf(&(yyval.string),"%s\n%s\n", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
     break;
 
   case 9:
-#line 42 "thesaurus.y"
-    {//c = newConceito($1);
+#line 47 "thesaurus.y"
+    { c = newConceito((yyvsp[(2) - (3)].string),relations);
+		 																addConceito(c,conceitos);
+																		 relations = NULL;
 			 															 asprintf(&(yyval.string),"%s%s\n%s\n" , (yyvsp[(1) - (3)].string) , (yyvsp[(2) - (3)].string) ,(yyvsp[(3) - (3)].string));}
     break;
 
   case 10:
-#line 44 "thesaurus.y"
+#line 51 "thesaurus.y"
     {(yyval.string) = " ";}
     break;
 
   case 11:
-#line 47 "thesaurus.y"
-    {asprintf(&(yyval.string), "%s - %s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
+#line 54 "thesaurus.y"
+    { r = newRelation((yyvsp[(1) - (2)].string),terms);
+																		  relations = addRelationTo(r,relations);
+																		  terms = NULL;
+																		 asprintf(&(yyval.string), "%s - %s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
     break;
 
   case 12:
-#line 48 "thesaurus.y"
-    {asprintf(&(yyval.string), "%s\n%s - %s", (yyvsp[(1) - (3)].string), (yyvsp[(2) - (3)].string) , (yyvsp[(3) - (3)].string));}
+#line 58 "thesaurus.y"
+    {r = newRelation((yyvsp[(2) - (3)].string),terms);
+																		 relations = addRelationTo(r,relations);
+																		 terms = NULL;
+			 															 asprintf(&(yyval.string), "%s\n%s - %s", (yyvsp[(1) - (3)].string), (yyvsp[(2) - (3)].string) , (yyvsp[(3) - (3)].string));}
     break;
 
   case 13:
-#line 51 "thesaurus.y"
-    {asprintf(&(yyval.string), "%s,%s", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string));}
+#line 64 "thesaurus.y"
+    { terms = addTermsTo((yyvsp[(1) - (3)].string),terms);
+																		 asprintf(&(yyval.string), "%s,%s", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string));}
     break;
 
   case 14:
-#line 52 "thesaurus.y"
-    { (yyval.string) = (yyvsp[(1) - (1)].string);}
+#line 66 "thesaurus.y"
+    { terms = addTermsTo((yyvsp[(1) - (1)].string),terms);
+		  																 (yyval.string) = (yyvsp[(1) - (1)].string);}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1407 "y.tab.c"
+#line 1423 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1617,10 +1633,9 @@ yyreturn:
 }
 
 
-#line 57 "thesaurus.y"
+#line 72 "thesaurus.y"
 
 #include "lex.yy.c"
-#include "structs.h"
 
 int main(){
 	#if YYDEBUG
@@ -1628,10 +1643,13 @@ int main(){
     #endif
 	
 	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
-	Conceito *c = newConceito("coisas");
-   	//rintf("Iniciar parse\n");
-   	//yyparse();
-   	//printf("Fim de parse\n");
+	
+	//conceitos -> contem toda a informacao do sistema
+	//para confirmar -> g_hash_table_foreach(conceitos,printConceito,NULL);
+	
+   	printf("Iniciar parse\n");
+   	yyparse();
+   	printf("Fim de parse\n");
    	return 0;
 }
 
