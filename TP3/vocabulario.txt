@@ -1,11 +1,11 @@
 #%language PT     
 #%baselang EN
 
-animal 				# termo na baselang
-PT animal			# LINGUA termo
+animal 				
+PT animal			
 NT cat, dog, cow
 NT camel
-BT Life being 		# BT = broader term = termo gen´erico
+BT Life being 	
 
 cat
 PT gato

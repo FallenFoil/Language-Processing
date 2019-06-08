@@ -11,7 +11,7 @@
 %%
 \% 							{PRINT_DEBUG; BEGIN OPTIONS;}
 <*>\# 						{PRINT_DEBUG; BEGIN COMENTARIO;}
-[a-zA-Z]					{PRINT_DEBUG; BEGIN CONCEITOS; yylval.string = strdup(yytext); return CONCEITO;}
+[a-zA-Z]+					{PRINT_DEBUG; BEGIN CONCEITOS; yylval.string = strdup(yytext); return CONCEITO;}
 [ \t\n]	 					{PRINT_DEBUG;}
 <OPTIONS>[a-z]+				{PRINT_DEBUG; yylval.string = strdup(yytext); return OPT;}
 <OPTIONS>[A-Z]+				{PRINT_DEBUG; yylval.string = strdup(yytext); return ARG;}
