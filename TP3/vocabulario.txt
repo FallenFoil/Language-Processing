@@ -1,2 +1,13 @@
-%language PT
-%baselang EN
+#%language PT     
+#%baselang EN
+
+animal 				# termo na baselang
+PT animal			# LINGUA termo
+NT cat, dog, cow
+NT camel
+BT Life being 		# BT = broader term = termo gen´erico
+
+cat
+PT gato
+BT animal
+SN animal que tem sete vidas e meia
