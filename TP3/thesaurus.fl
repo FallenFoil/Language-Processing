@@ -14,15 +14,19 @@
 <*>\# 													{PRINT_DEBUG; BEGIN COMENTARIO;}
 [a-zA-Z]+												{PRINT_DEBUG; BEGIN CONCEITOS; yylval.string = strdup(yytext); return CONCEITO;}
 [ \t\n]	 												{PRINT_DEBUG;}
+
 <OPTIONS>[a-z]+											{PRINT_DEBUG; yylval.string = strdup(yytext); return OPT;}
-<OPTIONS>[A-Z]+											{PRINT_DEBUG; yylval.string = strdup(yytext); return ARG;}
-<OPTIONS>\n 											{PRINT_DEBUG; BEGIN 0; return yytext[0];}
+<OPTIONS>[A-Z]+											{PRINT_DEBUG; yylval.string = strdup(yytext); return RELATION;}
+<OPTIONS>\n 											{PRINT_DEBUG; BEGIN 0;}
+
 <COMENTARIO>.											{PRINT_DEBUG;}
 <COMENTARIO>\n 											{PRINT_DEBUG; BEGIN 0;}
+
 <CONCEITOS>([A-Z]?[a-z]+[ ]*)*[A-Z]?[a-z]+				{PRINT_DEBUG; yylval.string = strdup(yytext); return TERMO;}
-<CONCEITOS>[A-Z]+										{PRINT_DEBUG; yylval.string = strdup(yytext); return ARG;}
-<CONCEITOS>[,\n]										{PRINT_DEBUG; return yytext[0];}
+<CONCEITOS>[A-Z]+										{PRINT_DEBUG; yylval.string = strdup(yytext); return RELATION;}
+<CONCEITOS>\n\n 										{PRINT_DEBUG; BEGIN 0;}
+<CONCEITOS>\n											{PRINT_DEBUG;}
+<CONCEITOS>,											{PRINT_DEBUG; return yytext[0];}
 <CONCEITOS>[ ]											{PRINT_DEBUG;}
-<CONCEITOS>\n\n 										{PRINT_DEBUG; BEGIN 0; yylval.string = strdup(yytext); return QUEBRA_LINHA;}
 <*>. 													{PRINT_DEBUG;}
 %%

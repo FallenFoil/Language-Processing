@@ -354,8 +354,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 16
-#define YY_END_OF_BUFFER 17
+#define YY_NUM_RULES 17
+#define YY_END_OF_BUFFER 18
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -365,9 +365,9 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[36] =
     {   0,
-        0,    0,    0,    0,    0,    0,    0,    0,   17,   15,
+        0,    0,    0,    0,    0,    0,    0,    0,   18,   16,
         4,    4,    2,    1,    3,    7,    6,    5,    8,    9,
-        2,   12,   13,   12,   11,   10,    3,    6,    5,   14,
+        2,   13,   15,   14,   11,   10,    3,    6,    5,   12,
        11,   10,    0,    0,    0
     } ;
 
@@ -769,69 +769,74 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 17 "thesaurus.fl"
+#line 18 "thesaurus.fl"
 {PRINT_DEBUG; yylval.string = strdup(yytext); return OPT;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 18 "thesaurus.fl"
-{PRINT_DEBUG; yylval.string = strdup(yytext); return ARG;}
+#line 19 "thesaurus.fl"
+{PRINT_DEBUG; yylval.string = strdup(yytext); return RELATION;}
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 19 "thesaurus.fl"
-{PRINT_DEBUG; BEGIN 0; return yytext[0];}
+#line 20 "thesaurus.fl"
+{PRINT_DEBUG; BEGIN 0;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 20 "thesaurus.fl"
+#line 22 "thesaurus.fl"
 {PRINT_DEBUG;}
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 21 "thesaurus.fl"
+#line 23 "thesaurus.fl"
 {PRINT_DEBUG; BEGIN 0;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 22 "thesaurus.fl"
+#line 25 "thesaurus.fl"
 {PRINT_DEBUG; yylval.string = strdup(yytext); return TERMO;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 23 "thesaurus.fl"
-{PRINT_DEBUG; yylval.string = strdup(yytext); return ARG;}
+#line 26 "thesaurus.fl"
+{PRINT_DEBUG; yylval.string = strdup(yytext); return RELATION;}
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 24 "thesaurus.fl"
-{PRINT_DEBUG; return yytext[0];}
+#line 27 "thesaurus.fl"
+{PRINT_DEBUG; BEGIN 0;}
 	YY_BREAK
 case 13:
+/* rule 13 can match eol */
 YY_RULE_SETUP
-#line 25 "thesaurus.fl"
+#line 28 "thesaurus.fl"
 {PRINT_DEBUG;}
 	YY_BREAK
 case 14:
-/* rule 14 can match eol */
 YY_RULE_SETUP
-#line 26 "thesaurus.fl"
-{PRINT_DEBUG; BEGIN 0; yylval.string = strdup(yytext); return QUEBRA_LINHA;}
+#line 29 "thesaurus.fl"
+{PRINT_DEBUG; return yytext[0];}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 27 "thesaurus.fl"
+#line 30 "thesaurus.fl"
 {PRINT_DEBUG;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 28 "thesaurus.fl"
+#line 31 "thesaurus.fl"
+{PRINT_DEBUG;}
+	YY_BREAK
+case 17:
+YY_RULE_SETUP
+#line 32 "thesaurus.fl"
 ECHO;
 	YY_BREAK
-#line 835 "lex.yy.c"
+#line 840 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(OPTIONS):
 case YY_STATE_EOF(COMENTARIO):
@@ -1839,5 +1844,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 28 "thesaurus.fl"
+#line 32 "thesaurus.fl"
 

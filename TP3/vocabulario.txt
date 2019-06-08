@@ -1,5 +1,6 @@
-#%language PT     
-#%baselang EN
+%language PT     
+%baselang EN
+%invis BT NT
 
 animal 				
 PT animal			
