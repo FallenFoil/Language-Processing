@@ -26,8 +26,8 @@ options: OPT args options 										{printf("%s - %s\n", $1, $2);}
 	|															{ }
 	;
 
-args: RELATION args  												{asprintf(&$$, "%s%s", $1, $2);}	 
-	| RELATION														{$$ = $1;}
+args: RELATION args  											{asprintf(&$$, "%s%s", $1, $2);}	 
+	| RELATION													{$$ = $1;}
 	;
 
 conceitos: CONCEITO relations conceitos 						{printf("%s\n\n%s\n", $1, $2);}
@@ -35,7 +35,7 @@ conceitos: CONCEITO relations conceitos 						{printf("%s\n\n%s\n", $1, $2);}
 	 	 |														{$$ = " ";}
 		 ;
 
-relations: RELATION termos relations									{asprintf(&$$, "%s - %s\n", $1, $2);}					
+relations: RELATION termos relations							{asprintf(&$$, "%s - %s\n", $1, $2);}					
 		 | 														{$$ = " ";}
 		 ;	
 
