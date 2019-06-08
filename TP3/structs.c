@@ -1,21 +1,22 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <glib.h>
-
-GHashTable *conceitos;
 
 typedef struct relations
 {
 	char *name;
-	GSList *terms;
+	GList *terms;
 } Relations;
+
 typedef struct conceito
 {
 	char *name;
-	GSList *relations;
+	GList *relations;
+
 } Conceito;
 
-Conceito* getConceito(char* concName){
+Conceito* getConceito(char* concName, GHashTable *conceitos){
 	return (Conceito *) g_hash_table_lookup(conceitos, concName);
 }
 
@@ -26,27 +27,26 @@ Conceito* newConceito(char *name){
 	return conceito;
 }
 
-void initConceitos(){
-	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
-}
 
-void addConceito(char* conceitoKey){
-	Conceito *conceito = getConceito(conceitoKey);
-	if(!conceito){
-		conceito = newConceito(conceitoKey);
-		g_hash_table_insert(conceitos, conceito->name, conceito);
+void addConceito(Conceito *c, GHashTable *conceitos){
+	
+	if(!g_hash_table_contains(conceitos,c->name)){
+		g_hash_table_insert(conceitos, c->name, c);
 	}
 }
 
-Relations* newRelations(char* relName){
+Relations* newRelation(char* relName){
 	Relations *relations = (Relations *) malloc(sizeof(Relations));
 	relations->name = strdup(relName);
 	relations->terms = NULL;
 	return relations;
 }
 
-void addRelationTo(char* relName, char* concName);
-
-GHashTable* getConceitos(){
-	return conceitos;
+void addRelationTo(Relations *r, Conceito *c){
+	c->relations= (GList *) g_list_append(c->relations,r);
 }
+
+void addTermsTo(char *termo, Relations *r){
+	r->terms = (GList *) g_list_append(r->terms,termo);
+}
+
