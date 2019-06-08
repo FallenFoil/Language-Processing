@@ -85,7 +85,6 @@
 #line 1 "thesaurus.y"
 
 #define YYDEBUG 0
- 
 
  #include <stdio.h>
  #include <glib.h>
@@ -131,7 +130,7 @@ typedef union YYSTYPE
 
 }
 /* Line 193 of yacc.c.  */
-#line 135 "y.tab.c"
+#line 134 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -144,7 +143,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 148 "y.tab.c"
+#line 147 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -359,7 +358,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   16
+#define YYLAST   14
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  8
@@ -368,7 +367,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  14
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  22
+#define YYNSTATES  21
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -414,15 +413,15 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     6,     9,    13,    14,    16,    19,    22,
+       0,     0,     3,     6,    10,    13,    14,    17,    19,    22,
       26,    27,    30,    34,    38
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-       9,     0,    -1,    10,    12,    -1,     3,    11,    -1,    10,
-       3,    11,    -1,    -1,     5,    -1,    11,     5,    -1,     4,
+       9,     0,    -1,    10,    12,    -1,     3,    11,    10,    -1,
+       3,    11,    -1,    -1,     5,    11,    -1,     5,    -1,     4,
       13,    -1,    12,     4,    13,    -1,    -1,     5,    14,    -1,
       13,     5,    14,    -1,     6,     7,    14,    -1,     6,    -1
 };
@@ -430,8 +429,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    31,    31,    34,    35,    36,    39,    40,    43,    47,
-      51,    54,    58,    64,    66
+       0,    31,    31,    34,    35,    36,    39,    40,    44,    48,
+      52,    55,    59,    65,    67
 };
 #endif
 
@@ -465,7 +464,7 @@ static const yytype_uint8 yyr1[] =
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     2,     2,     3,     0,     1,     2,     2,     3,
+       0,     2,     2,     3,     2,     0,     2,     1,     2,     3,
        0,     2,     3,     3,     1
 };
 
@@ -474,31 +473,31 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       5,     0,     0,    10,     6,     3,     1,     0,     0,     2,
-       7,     4,     0,     8,     0,    14,    11,     0,     9,     0,
-      12,    13
+       5,     0,     0,    10,     7,     4,     1,     0,     2,     6,
+       3,     0,     8,     0,    14,    11,     0,     9,     0,    12,
+      13
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     5,     9,    13,    16
+      -1,     2,     3,     5,     8,    12,    15
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -18
+#define YYPACT_NINF -17
 static const yytype_int8 yypact[] =
 {
-      -2,     1,     5,     0,   -18,     2,   -18,     1,     3,     6,
-     -18,     2,     7,     4,     3,     8,   -18,     7,     4,     7,
-     -18,   -18
+      -2,    -1,     3,     1,    -1,    -2,   -17,     2,     4,   -17,
+     -17,     0,     5,     2,     6,   -17,     0,     5,     0,   -17,
+     -17
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -18,   -18,   -18,     9,   -18,    -3,   -17
+     -17,   -17,     7,    10,   -17,    -4,   -16
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -508,23 +507,23 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      20,     1,    21,     7,     8,     6,     4,    10,    12,    17,
-      14,    18,     0,    15,     0,    19,    11
+      19,     1,    20,     6,     4,     7,    14,    11,    13,    17,
+      16,     0,    10,    18,     9
 };
 
 static const yytype_int8 yycheck[] =
 {
-      17,     3,    19,     3,     4,     0,     5,     5,     5,     5,
-       4,    14,    -1,     6,    -1,     7,     7
+      16,     3,    18,     0,     5,     4,     6,     5,     4,    13,
+       5,    -1,     5,     7,     4
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     9,    10,     5,    11,     0,     3,     4,    12,
-       5,    11,     5,    13,     4,     6,    14,     5,    13,     7,
-      14,    14
+       0,     3,     9,    10,     5,    11,     0,     4,    12,    11,
+      10,     5,    13,     4,     6,    14,     5,    13,     7,    14,
+      14
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1340,17 +1339,17 @@ yyreduce:
     {
         case 2:
 #line 31 "thesaurus.y"
-    {g_hash_table_foreach(conceitos,printConceito,NULL);}
+    {g_hash_table_foreach(conceitos,printCon,NULL);}
     break;
 
   case 3:
 #line 34 "thesaurus.y"
-    {asprintf(&(yyval.string),"%s - %s\n", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
+    {printf("%s - %s\n", (yyvsp[(1) - (3)].string), (yyvsp[(2) - (3)].string));}
     break;
 
   case 4:
 #line 35 "thesaurus.y"
-    {asprintf(&(yyval.string),"%s - %s\n", (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].string));}
+    {printf("%s - %s\n", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
     break;
 
   case 5:
@@ -1360,16 +1359,16 @@ yyreduce:
 
   case 6:
 #line 39 "thesaurus.y"
-    {(yyval.string) = (yyvsp[(1) - (1)].string);}
+    {asprintf(&(yyval.string), "%s%s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
     break;
 
   case 7:
 #line 40 "thesaurus.y"
-    {asprintf(&(yyval.string), "%s%s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));}
+    {(yyval.string) = (yyvsp[(1) - (1)].string);}
     break;
 
   case 8:
-#line 43 "thesaurus.y"
+#line 44 "thesaurus.y"
     { c = newConceito((yyvsp[(1) - (2)].string),relations);
 																		 addConceito(c,conceitos);
 																		 relations = NULL;
@@ -1377,20 +1376,20 @@ yyreduce:
     break;
 
   case 9:
-#line 47 "thesaurus.y"
+#line 48 "thesaurus.y"
     { c = newConceito((yyvsp[(2) - (3)].string),relations);
-		 																addConceito(c,conceitos);
+		 																 addConceito(c,conceitos);
 																		 relations = NULL;
 			 															 asprintf(&(yyval.string),"%s%s\n%s\n" , (yyvsp[(1) - (3)].string) , (yyvsp[(2) - (3)].string) ,(yyvsp[(3) - (3)].string));}
     break;
 
   case 10:
-#line 51 "thesaurus.y"
+#line 52 "thesaurus.y"
     {(yyval.string) = " ";}
     break;
 
   case 11:
-#line 54 "thesaurus.y"
+#line 55 "thesaurus.y"
     { r = newRelation((yyvsp[(1) - (2)].string),terms);
 																		  relations = addRelationTo(r,relations);
 																		  terms = NULL;
@@ -1398,7 +1397,7 @@ yyreduce:
     break;
 
   case 12:
-#line 58 "thesaurus.y"
+#line 59 "thesaurus.y"
     {r = newRelation((yyvsp[(2) - (3)].string),terms);
 																		 relations = addRelationTo(r,relations);
 																		 terms = NULL;
@@ -1406,20 +1405,20 @@ yyreduce:
     break;
 
   case 13:
-#line 64 "thesaurus.y"
+#line 65 "thesaurus.y"
     { terms = addTermsTo((yyvsp[(1) - (3)].string),terms);
 																		 asprintf(&(yyval.string), "%s,%s", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string));}
     break;
 
   case 14:
-#line 66 "thesaurus.y"
+#line 67 "thesaurus.y"
     { terms = addTermsTo((yyvsp[(1) - (1)].string),terms);
 		  																 (yyval.string) = (yyvsp[(1) - (1)].string);}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1423 "y.tab.c"
+#line 1422 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1633,10 +1632,9 @@ yyreturn:
 }
 
 
-#line 72 "thesaurus.y"
+#line 73 "thesaurus.y"
 
 #include "lex.yy.c"
-
 int main(){
 	#if YYDEBUG
         yydebug = 1;

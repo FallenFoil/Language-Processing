@@ -1,6 +1,5 @@
 %{
 #define YYDEBUG 0
- 
 
  #include <stdio.h>
  #include <glib.h>
@@ -16,6 +15,7 @@
  Relations *r;
 
 %}
+
 %union{
 	char *string;
     //char *option;
@@ -24,28 +24,29 @@
 
 }
 %token OPT CONCEITO RELATION TERMO
-%type <string> OPT RELATION args CONCEITO termos TERMO conceitos relations options thesaurus
+%type <string> OPT RELATION args CONCEITO termos TERMO conceitos relations thesaurus options
 
 %%
 
-thesaurus: options conceitos											{g_hash_table_foreach(conceitos,printConceito,NULL);}//printf("%s%s\n",$1,$2);}
+thesaurus: options conceitos											{g_hash_table_foreach(conceitos,printCon,NULL);}//printf("%s%s\n",$1,$2);}
 	;
 
-options: OPT args 														{asprintf(&$$,"%s - %s\n", $1, $2);}
-		| options OPT args 												{asprintf(&$$,"%s - %s\n", $2, $3);}
-		|																{ }
-		;
-
-args: RELATION   														{$$ = $1;}
-	| args RELATION														{asprintf(&$$, "%s%s", $1, $2);}	 	
+options: OPT args options 												{printf("%s - %s\n", $1, $2);}
+	| OPT args 															{printf("%s - %s\n", $1, $2);}
+	|																	{ }
 	;
+
+args: RELATION args  													{asprintf(&$$, "%s%s", $1, $2);}	 
+	| RELATION															{$$ = $1;}
+	;
+
 
 conceitos: CONCEITO relations											{ c = newConceito($1,relations);
 																		 addConceito(c,conceitos);
 																		 relations = NULL;
 																		 asprintf(&$$,"%s\n%s\n", $1, $2);}
 		 | conceitos CONCEITO relations 								{ c = newConceito($2,relations);
-		 																addConceito(c,conceitos);
+		 																 addConceito(c,conceitos);
 																		 relations = NULL;
 			 															 asprintf(&$$,"%s%s\n%s\n" , $1 , $2 ,$3);}
 	 	 |																{$$ = " ";}
@@ -71,7 +72,6 @@ termos: TERMO ',' termos												{ terms = addTermsTo($1,terms);
 
 %%
 #include "lex.yy.c"
-
 int main(){
 	#if YYDEBUG
         yydebug = 1;
