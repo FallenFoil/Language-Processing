@@ -1,19 +1,15 @@
 %{
 #define YYDEBUG 0
-
  #include <stdio.h>
  #include <glib.h>
  #include "structs.c"
  int yyerror(char *s){ fprintf(stderr, "Erro:%s\n", s); return 0;}
  int yylex();
  
- GHashTable *conceitos; //contem toda a informação
  GList *terms = NULL;
  GList *relations = NULL;
-
  Conceito *c;
  Relations *r;
-
 %}
 
 %union{
@@ -42,11 +38,11 @@ args: RELATION args  													{asprintf(&$$, "%s%s", $1, $2);}
 
 
 conceitos: CONCEITO relations											{ c = newConceito($1,relations);
-																		 addConceito(c,conceitos);
+																		 addConceito(c);
 																		 relations = NULL;
 																		 asprintf(&$$,"%s\n%s\n", $1, $2);}
 		 | conceitos CONCEITO relations 								{ c = newConceito($2,relations);
-		 																 addConceito(c,conceitos);
+		 																 addConceito(c);
 																		 relations = NULL;
 			 															 asprintf(&$$,"%s%s\n%s\n" , $1 , $2 ,$3);}
 	 	 |																{$$ = " ";}
@@ -81,9 +77,10 @@ int main(){
 	
 	//conceitos -> contem toda a informacao do sistema
 	//para confirmar -> g_hash_table_foreach(conceitos,printConceito,NULL);
-	
+	initConceitos();
    	printf("Iniciar parse\n");
    	yyparse();
    	printf("Fim de parse\n");
+   	createHTML();
    	return 0;
 }

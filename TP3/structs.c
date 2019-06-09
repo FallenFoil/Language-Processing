@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <glib.h>
 
-GHashTable *conceitos;
-
+GHashTable *conceitos; //contem toda a informação
+GHashTable *termsByRelation; //Chave = char* relação , value = List<List<char *>> termos da relacao
+							 //EXEMPLO Chave BT , value = {{animal, cao}, {animal, gato}, {ser vivo, anima}} Não é obrigatório ser de cumprimento 2
 
 typedef struct relation
 {
@@ -21,6 +22,7 @@ typedef struct conceito
 
 
 /////////////////////////////// HTML ///////////////////////////////
+
 void BEGIN_HTML(FILE* file, char* title){
 	fprintf(file, "<!DOCTYPE html>\n<html lang=\"en\">\n\t<head>\n\t\t<title> %s </title>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta name=\"description\" \
 		content=\"%s\">\n\t\t<link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700\" rel=\"stylesheet\">\n\t</head>\n\t \
@@ -31,25 +33,55 @@ void END_HTML(FILE* file){
 	fprintf(file, "\n\t</body>\n</html>");
 }
 
+void printTerm(void* term, void* file){
+	fprintf((FILE*)file, "Term: %s,", (char*) term);
+}
+
 void printRelation(void* relation ,void *file){
-	fprintf((FILE*)file, "Nome: %s\n", ((Relations*) relation)->name);
+	Relations* rel = (Relations*) relation;
+	fprintf((FILE*)file, "Nome: %s\n", rel->name);
+	g_list_foreach(rel->terms, printTerm, file);
 }
 
 void printConceito(Conceito *conceito, FILE *file){
 	fprintf(file, "<h1>Nome: %s</h1>\nRelações:\n", conceito->name);
 	g_list_foreach(conceito->relations, printRelation, file);
 }
+
+void createHTML(){
+	FILE* index = fopen("./html/index.html", "w");
+	BEGIN_HTML(index, "Index");
+	
+	GHashTableIter iter;
+	gpointer key, value;
+	g_hash_table_iter_init (&iter, conceitos);
+	while (g_hash_table_iter_next (&iter, &key, &value)){
+		char filePath[100] = "./html/conceitos/";
+		strcat(filePath, key);
+		strcat(filePath, ".html");
+		FILE * file = fopen(filePath, "w");
+		BEGIN_HTML(file, key);
+		printConceito((Conceito *) value, file);
+		printConceito((Conceito *) value, index);
+		END_HTML(file);
+		fclose(file);
+  	}
+
+  	END_HTML(index);
+  	fclose(index);
+}
+
 /////////////////////////////// HTML ///////////////////////////////
 
 void initConceitos(){
 	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
 }
 
-Conceito* getConceito(char* concName, GHashTable *conceitos){
+Conceito* getConceito(char* concName){
 	return (Conceito *) g_hash_table_lookup(conceitos, concName);
 }
 
-Conceito* newConceito(char *name,GList *r){
+Conceito* newConceito(char *name, GList *r){
 	Conceito *conceito = (Conceito *) malloc(sizeof(Conceito));
 	conceito->name = strdup(name);
 	conceito->relations = r;
@@ -57,8 +89,7 @@ Conceito* newConceito(char *name,GList *r){
 }
 
 
-void addConceito(Conceito *c, GHashTable *conceitos){
-	
+void addConceito(Conceito *c){
 	if(!g_hash_table_contains(conceitos,c->name)){
 		g_hash_table_insert(conceitos, c->name, c);
 	}
