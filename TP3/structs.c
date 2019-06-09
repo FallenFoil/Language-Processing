@@ -7,6 +7,7 @@ GHashTable *conceitos; //contem toda a informação
 GHashTable *termsByRelation; //Chave = char* relação , value = List<List<char *>> termos da relacao
 							 //EXEMPLO Chave BT , value = {{animal, cao}, {animal, gato}, {ser vivo, anima}} Não é obrigatório ser de cumprimento 2
 
+
 typedef struct relation
 {
 	char *name;
@@ -48,10 +49,7 @@ void printConceito(Conceito *conceito, FILE *file){
 	g_list_foreach(conceito->relations, printRelation, file);
 }
 
-void createHTML(){
-	FILE* index = fopen("./html/index.html", "w");
-	BEGIN_HTML(index, "Index");
-	
+void printConceitos(FILE *index){
 	GHashTableIter iter;
 	gpointer key, value;
 	g_hash_table_iter_init (&iter, conceitos);
@@ -66,6 +64,30 @@ void createHTML(){
 		END_HTML(file);
 		fclose(file);
   	}
+}
+/**
+void printRelations(FILE *index){
+	GHashTableIter iter;
+	gpointer key, value;
+	g_hash_table_iter_init (&iter, conceitos);
+	while (g_hash_table_iter_next (&iter, &key, &value)){
+		char filePath[100] = "./html/conceitos/";
+		strcat(filePath, key);
+		strcat(filePath, ".html");
+		FILE * file = fopen(filePath, "w");
+		BEGIN_HTML(file, key);
+		printConceito((Conceito *) value, file);
+		printConceito((Conceito *) value, index);
+		END_HTML(file);
+		fclose(file);
+  	}
+}
+*//
+void createHTML(){
+	FILE* index = fopen("./html/index.html", "w");
+	BEGIN_HTML(index, "Index");
+	
+	printConceitos();
 
   	END_HTML(index);
   	fclose(index);
@@ -75,6 +97,15 @@ void createHTML(){
 
 void initConceitos(){
 	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
+}
+
+void initRelations(){
+	termsByRelation = g_hash_table_new(g_str_hash, g_str_equal);
+} 
+
+void init(){
+	initConceitos();
+	initRelations();
 }
 
 Conceito* getConceito(char* concName){
@@ -102,8 +133,21 @@ Relations* newRelation(char* relName,GList *r){
 	return relations;
 }
 
+void addTermsToRelations(Relations * rel){
+	if(!g_hash_table_contains(termsByRelation,rel->name)){
+		Relations * novaRel = newRelation(rel->name, NULL);
+		novaRel->terms = g_list_append(novaRel->terms, rel->terms);
+		g_hash_table_insert(termsByRelation, novaRel->name, novaRel);
+	} else {
+		Relations * allTermsFromRel = (Relations *)g_hash_table_lookup(termsByRelation, rel->name);
+		allTermsFromRel->terms = g_list_append(allTermsFromRel->terms, rel->terms);
+	}
+}
+
+
 GList* addRelationTo(Relations *r, GList *l){
 	l = g_list_append(l,r);
+	addTermsToRelations(r);
 	return l;
 }
 

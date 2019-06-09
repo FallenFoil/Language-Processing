@@ -28,7 +28,6 @@ thesaurus: options conceitos											{g_hash_table_foreach(conceitos,printCon,
 	;
 
 options: OPT args options 												{printf("%s - %s\n", $1, $2);}
-	| OPT args 															{printf("%s - %s\n", $1, $2);}
 	|																	{ }
 	;
 
@@ -37,11 +36,7 @@ args: RELATION args  													{asprintf(&$$, "%s%s", $1, $2);}
 	;
 
 
-conceitos: CONCEITO relations											{ c = newConceito($1,relations);
-																		 addConceito(c);
-																		 relations = NULL;
-																		 asprintf(&$$,"%s\n%s\n", $1, $2);}
-		 | conceitos CONCEITO relations 								{ c = newConceito($2,relations);
+conceitos:  conceitos CONCEITO relations 								{ c = newConceito($2,relations);
 		 																 addConceito(c);
 																		 relations = NULL;
 			 															 asprintf(&$$,"%s%s\n%s\n" , $1 , $2 ,$3);}
@@ -72,12 +67,9 @@ int main(){
 	#if YYDEBUG
         yydebug = 1;
     #endif
-	
-	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
-	
 	//conceitos -> contem toda a informacao do sistema
 	//para confirmar -> g_hash_table_foreach(conceitos,printConceito,NULL);
-	initConceitos();
+	init();
    	printf("Iniciar parse\n");
    	yyparse();
    	printf("Fim de parse\n");

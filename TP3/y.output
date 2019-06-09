@@ -1,7 +1,3 @@
-State 3 conflicts: 1 shift/reduce
-State 5 conflicts: 2 reduce/reduce
-
-
 Grammar
 
     0 $accept: thesaurus $end
@@ -9,32 +5,30 @@ Grammar
     1 thesaurus: options conceitos
 
     2 options: OPT args options
-    3        | OPT args
-    4        | %empty
+    3        | %empty
 
-    5 args: RELATION args
-    6     | RELATION
+    4 args: RELATION args
+    5     | RELATION
 
-    7 conceitos: CONCEITO relations
-    8          | conceitos CONCEITO relations
-    9          | %empty
+    6 conceitos: conceitos CONCEITO relations
+    7          | %empty
 
-   10 relations: RELATION termos
-   11          | relations RELATION termos
+    8 relations: RELATION termos
+    9          | relations RELATION termos
 
-   12 termos: TERMO ',' termos
-   13       | TERMO
+   10 termos: TERMO ',' termos
+   11       | TERMO
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-',' (44) 12
+',' (44) 10
 error (256)
-OPT (258) 2 3
-CONCEITO (259) 7 8
-RELATION (260) 5 6 10 11
-TERMO (261) 12 13
+OPT (258) 2
+CONCEITO (259) 6
+RELATION (260) 4 5 8 9
+TERMO (261) 10 11
 
 
 Nonterminals, with rules where they appear
@@ -44,15 +38,15 @@ $accept (8)
 thesaurus (9)
     on left: 1, on right: 0
 options (10)
-    on left: 2 3 4, on right: 1 2
+    on left: 2 3, on right: 1 2
 args (11)
-    on left: 5 6, on right: 2 3 5
+    on left: 4 5, on right: 2 4
 conceitos (12)
-    on left: 7 8 9, on right: 1 8
+    on left: 6 7, on right: 1 6
 relations (13)
-    on left: 10 11, on right: 7 8 11
+    on left: 8 9, on right: 6 9
 termos (14)
-    on left: 12 13, on right: 10 11 12
+    on left: 10 11, on right: 8 9 10
 
 
 State 0
@@ -61,7 +55,7 @@ State 0
 
     OPT  shift, and go to state 1
 
-    $default  reduce using rule 4 (options)
+    $default  reduce using rule 3 (options)
 
     thesaurus  go to state 2
     options    go to state 3
@@ -70,7 +64,6 @@ State 0
 State 1
 
     2 options: OPT . args options
-    3        | OPT . args
 
     RELATION  shift, and go to state 4
 
@@ -88,40 +81,32 @@ State 3
 
     1 thesaurus: options . conceitos
 
-    CONCEITO  shift, and go to state 7
+    $default  reduce using rule 7 (conceitos)
 
-    CONCEITO  [reduce using rule 9 (conceitos)]
-    $default  reduce using rule 9 (conceitos)
-
-    conceitos  go to state 8
+    conceitos  go to state 7
 
 
 State 4
 
-    5 args: RELATION . args
-    6     | RELATION .
+    4 args: RELATION . args
+    5     | RELATION .
 
     RELATION  shift, and go to state 4
 
-    $default  reduce using rule 6 (args)
+    $default  reduce using rule 5 (args)
 
-    args  go to state 9
+    args  go to state 8
 
 
 State 5
 
     2 options: OPT args . options
-    3        | OPT args .
 
     OPT  shift, and go to state 1
 
-    $end      reduce using rule 3 (options)
-    $end      [reduce using rule 4 (options)]
-    CONCEITO  reduce using rule 3 (options)
-    CONCEITO  [reduce using rule 4 (options)]
     $default  reduce using rule 3 (options)
 
-    options  go to state 10
+    options  go to state 9
 
 
 State 6
@@ -133,119 +118,100 @@ State 6
 
 State 7
 
-    7 conceitos: CONCEITO . relations
-
-    RELATION  shift, and go to state 11
-
-    relations  go to state 12
-
-
-State 8
-
     1 thesaurus: options conceitos .
-    8 conceitos: conceitos . CONCEITO relations
+    6 conceitos: conceitos . CONCEITO relations
 
-    CONCEITO  shift, and go to state 13
+    CONCEITO  shift, and go to state 10
 
     $default  reduce using rule 1 (thesaurus)
 
 
+State 8
+
+    4 args: RELATION args .
+
+    $default  reduce using rule 4 (args)
+
+
 State 9
-
-    5 args: RELATION args .
-
-    $default  reduce using rule 5 (args)
-
-
-State 10
 
     2 options: OPT args options .
 
     $default  reduce using rule 2 (options)
 
 
+State 10
+
+    6 conceitos: conceitos CONCEITO . relations
+
+    RELATION  shift, and go to state 11
+
+    relations  go to state 12
+
+
 State 11
 
-   10 relations: RELATION . termos
+    8 relations: RELATION . termos
 
-    TERMO  shift, and go to state 14
+    TERMO  shift, and go to state 13
 
-    termos  go to state 15
+    termos  go to state 14
 
 
 State 12
 
-    7 conceitos: CONCEITO relations .
-   11 relations: relations . RELATION termos
+    6 conceitos: conceitos CONCEITO relations .
+    9 relations: relations . RELATION termos
 
-    RELATION  shift, and go to state 16
+    RELATION  shift, and go to state 15
 
-    $default  reduce using rule 7 (conceitos)
+    $default  reduce using rule 6 (conceitos)
 
 
 State 13
 
-    8 conceitos: conceitos CONCEITO . relations
+   10 termos: TERMO . ',' termos
+   11       | TERMO .
 
-    RELATION  shift, and go to state 11
+    ','  shift, and go to state 16
 
-    relations  go to state 17
+    $default  reduce using rule 11 (termos)
 
 
 State 14
 
-   12 termos: TERMO . ',' termos
-   13       | TERMO .
+    8 relations: RELATION termos .
 
-    ','  shift, and go to state 18
-
-    $default  reduce using rule 13 (termos)
+    $default  reduce using rule 8 (relations)
 
 
 State 15
 
-   10 relations: RELATION termos .
+    9 relations: relations RELATION . termos
 
-    $default  reduce using rule 10 (relations)
+    TERMO  shift, and go to state 13
+
+    termos  go to state 17
 
 
 State 16
 
-   11 relations: relations RELATION . termos
+   10 termos: TERMO ',' . termos
 
-    TERMO  shift, and go to state 14
+    TERMO  shift, and go to state 13
 
-    termos  go to state 19
+    termos  go to state 18
 
 
 State 17
 
-    8 conceitos: conceitos CONCEITO relations .
-   11 relations: relations . RELATION termos
+    9 relations: relations RELATION termos .
 
-    RELATION  shift, and go to state 16
-
-    $default  reduce using rule 8 (conceitos)
+    $default  reduce using rule 9 (relations)
 
 
 State 18
 
-   12 termos: TERMO ',' . termos
+   10 termos: TERMO ',' termos .
 
-    TERMO  shift, and go to state 14
-
-    termos  go to state 20
-
-
-State 19
-
-   11 relations: relations RELATION termos .
-
-    $default  reduce using rule 11 (relations)
-
-
-State 20
-
-   12 termos: TERMO ',' termos .
-
-    $default  reduce using rule 12 (termos)
+    $default  reduce using rule 10 (termos)

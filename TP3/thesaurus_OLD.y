@@ -27,7 +27,7 @@
 thesaurus: options conceitos											{g_hash_table_foreach(conceitos,printCon,NULL);}//printf("%s%s\n",$1,$2);}
 	;
 
-options: OPT args '\n' options 												{printf("%s - %s\n", $1, $2);}
+options: OPT args options 												{printf("%s - %s\n", $1, $2);}
 	| OPT args 															{printf("%s - %s\n", $1, $2);}
 	|																	{ }
 	;
@@ -41,7 +41,7 @@ conceitos: CONCEITO relations											{ c = newConceito($1,relations);
 																		 addConceito(c);
 																		 relations = NULL;
 																		 asprintf(&$$,"%s\n%s\n", $1, $2);}
-		 | CONCEITO relations "\n\n" conceitos								{ c = newConceito($2,relations);
+		 | CONCEITO relations conceitos								{ c = newConceito($2,relations);
 		 																 addConceito(c);
 																		 relations = NULL;
 			 															 asprintf(&$$,"%s%s\n%s\n" , $1 , $2 ,$4);}
