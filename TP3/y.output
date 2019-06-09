@@ -1,5 +1,5 @@
+State 3 conflicts: 1 shift/reduce
 State 5 conflicts: 2 reduce/reduce
-State 12 conflicts: 1 reduce/reduce
 
 
 Grammar
@@ -16,7 +16,7 @@ Grammar
     6     | RELATION
 
     7 conceitos: CONCEITO relations
-    8          | CONCEITO relations conceitos
+    8          | conceitos CONCEITO relations
     9          | %empty
 
    10 relations: RELATION termos
@@ -90,6 +90,7 @@ State 3
 
     CONCEITO  shift, and go to state 7
 
+    CONCEITO  [reduce using rule 9 (conceitos)]
     $default  reduce using rule 9 (conceitos)
 
     conceitos  go to state 8
@@ -133,7 +134,6 @@ State 6
 State 7
 
     7 conceitos: CONCEITO . relations
-    8          | CONCEITO . relations conceitos
 
     RELATION  shift, and go to state 11
 
@@ -143,6 +143,9 @@ State 7
 State 8
 
     1 thesaurus: options conceitos .
+    8 conceitos: conceitos . CONCEITO relations
+
+    CONCEITO  shift, and go to state 13
 
     $default  reduce using rule 1 (thesaurus)
 
@@ -165,77 +168,83 @@ State 11
 
    10 relations: RELATION . termos
 
-    TERMO  shift, and go to state 13
+    TERMO  shift, and go to state 14
 
-    termos  go to state 14
+    termos  go to state 15
 
 
 State 12
 
     7 conceitos: CONCEITO relations .
-    8          | CONCEITO relations . conceitos
    11 relations: relations . RELATION termos
 
-    CONCEITO  shift, and go to state 7
-    RELATION  shift, and go to state 15
+    RELATION  shift, and go to state 16
 
-    $end      reduce using rule 7 (conceitos)
-    $end      [reduce using rule 9 (conceitos)]
     $default  reduce using rule 7 (conceitos)
-
-    conceitos  go to state 16
 
 
 State 13
 
+    8 conceitos: conceitos CONCEITO . relations
+
+    RELATION  shift, and go to state 11
+
+    relations  go to state 17
+
+
+State 14
+
    12 termos: TERMO . ',' termos
    13       | TERMO .
 
-    ','  shift, and go to state 17
+    ','  shift, and go to state 18
 
     $default  reduce using rule 13 (termos)
 
 
-State 14
+State 15
 
    10 relations: RELATION termos .
 
     $default  reduce using rule 10 (relations)
 
 
-State 15
+State 16
 
    11 relations: relations RELATION . termos
 
-    TERMO  shift, and go to state 13
-
-    termos  go to state 18
-
-
-State 16
-
-    8 conceitos: CONCEITO relations conceitos .
-
-    $default  reduce using rule 8 (conceitos)
-
-
-State 17
-
-   12 termos: TERMO ',' . termos
-
-    TERMO  shift, and go to state 13
+    TERMO  shift, and go to state 14
 
     termos  go to state 19
 
 
+State 17
+
+    8 conceitos: conceitos CONCEITO relations .
+   11 relations: relations . RELATION termos
+
+    RELATION  shift, and go to state 16
+
+    $default  reduce using rule 8 (conceitos)
+
+
 State 18
+
+   12 termos: TERMO ',' . termos
+
+    TERMO  shift, and go to state 14
+
+    termos  go to state 20
+
+
+State 19
 
    11 relations: relations RELATION termos .
 
     $default  reduce using rule 11 (relations)
 
 
-State 19
+State 20
 
    12 termos: TERMO ',' termos .
 
