@@ -35,21 +35,36 @@ void END_HTML(FILE* file){
 }
 
 void printTerm(void* term, void* file){
-	fprintf((FILE*)file, "Term: %s,", (char*) term);
+	fprintf((FILE*)file, "<li>Term: %s</li>\n", (char*) term);
 }
 
 void printRelation(void* relation ,void *file){
 	Relations* rel = (Relations*) relation;
-	fprintf((FILE*)file, "Nome: %s\n", rel->name);
+	fprintf((FILE*)file, "<h4>Relação: %s</h4>\n", rel->name);
+	fprintf(file, "<ul>");
 	g_list_foreach(rel->terms, printTerm, file);
+	fprintf(file, "</ul>");
+}
+
+void printTermsOfRelation(void* terms, void* file){
+	g_list_foreach(terms, printTerm, file);
+	fprintf(file, "\n");
+}
+
+void printRelationByTerms(void *terms, void* file){
+	GList * listTerms = (GList *) terms;
+	g_list_foreach(listTerms, printTermsOfRelation, file);
 }
 
 void printConceito(Conceito *conceito, FILE *file){
-	fprintf(file, "<h1>Nome: %s</h1>\nRelações:\n", conceito->name);
+	fprintf(file, "<h1>Conceito: %s</h1>\n<h2>Relações:</h2>\n", conceito->name);
 	g_list_foreach(conceito->relations, printRelation, file);
 }
 
-void printConceitos(FILE *index){
+void printConceitos(){
+	FILE* index = fopen("./html/conceitos/index.html", "w");
+	BEGIN_HTML(index, "Index");
+
 	GHashTableIter iter;
 	gpointer key, value;
 	g_hash_table_iter_init (&iter, conceitos);
@@ -60,35 +75,45 @@ void printConceitos(FILE *index){
 		FILE * file = fopen(filePath, "w");
 		BEGIN_HTML(file, key);
 		printConceito((Conceito *) value, file);
-		printConceito((Conceito *) value, index);
+		fprintf(index, "<h1><a href=\"./%s.html\">%s</a></h1>\n", (char*)key, (char*)key);
 		END_HTML(file);
 		fclose(file);
   	}
+
+  	END_HTML(index);
+  	fclose(index);
 }
-/**
-void printRelations(FILE *index){
+
+void printRelations(){
+	FILE* index = fopen("./html/relacoes/index.html", "w");
+	BEGIN_HTML(index, "Index");
+
 	GHashTableIter iter;
 	gpointer key, value;
-	g_hash_table_iter_init (&iter, conceitos);
+	g_hash_table_iter_init (&iter, termsByRelation);
 	while (g_hash_table_iter_next (&iter, &key, &value)){
-		char filePath[100] = "./html/conceitos/";
+		char filePath[100] = "./html/relacoes/";
 		strcat(filePath, key);
 		strcat(filePath, ".html");
 		FILE * file = fopen(filePath, "w");
 		BEGIN_HTML(file, key);
-		printConceito((Conceito *) value, file);
-		printConceito((Conceito *) value, index);
+		printTermsOfRelation((Conceito *) value, file);
+		fprintf(index, "<h1><a href=\"./%s.html\">%s</a></h1>\n", (char*)key, (char*)key);
 		END_HTML(file);
 		fclose(file);
   	}
+
+  	END_HTML(index);
+  	fclose(index);
 }
-*//
+
 void createHTML(){
 	FILE* index = fopen("./html/index.html", "w");
 	BEGIN_HTML(index, "Index");
-	
 	printConceitos();
-
+	fprintf(index, "<h1><a href=\"./conceitos/index.html\">Conceitos</a></h1>\n");
+	printRelations();
+	fprintf(index, "<h1><a href=\"./relacoes/index.html\">Relações</a></h1>\n");
   	END_HTML(index);
   	fclose(index);
 }
