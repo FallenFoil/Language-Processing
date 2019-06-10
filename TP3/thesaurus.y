@@ -28,12 +28,12 @@
 thesaurus: options conceitos											{g_hash_table_foreach(conceitos,printCon,NULL);}//printf("%s%s\n",$1,$2);}
 	;
 
-options: OPT args options 												{addOption($1, rel4Opts), rel4Opts = NULL, printf("%s - %s\n", $1, $2);}
+options: options OPT args 												{addOption($2, rel4Opts), rel4Opts = NULL, printf("%s - %s\n", $1, $2);}
 	|																	{ }
 	;
 
 args: RELATION args  													{rel4Opts = g_list_append(rel4Opts, $1); asprintf(&$$, "%s%s", $1, $2);}	 
-	| RELATION															{rel4Opts = g_list_append(rel4Opts, $1); $$ = $1;}
+	| RELATION															{rel4Opts = g_list_append(rel4Opts, $1);}
 	;
 
 

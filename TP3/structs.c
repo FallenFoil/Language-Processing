@@ -123,17 +123,32 @@ void printRelations(){
   	fclose(index);
 }
 
+void printOption(void* option, void* file){
+	FILE* index = (FILE*) file;
+	Option *opt = (Option*)  option;
+	fprintf(index, "<h2>%s", opt->name);
+	if(opt->rel1 != NULL)
+		fprintf(index, " %s\n", opt->rel1);
+	if(opt->rel2 != NULL)
+		fprintf(index, " %s\n", opt->rel2);
+	fprintf(index, "</h2>\n");
+}
+
+void printOptions(FILE* index){
+	g_list_foreach(options, printOption, index);
+}
+
 void createHTML(){
 	FILE* index = fopen("./html/index.html", "w");
 	BEGIN_HTML(index, "Index");
 
+	printOptions(index);
 	printConceitos();
 	fprintf(index, "<h1><a href=\"./conceitos/index.html\">Conceitos</a></h1>\n");
 	printRelations();
 	fprintf(index, "<h1><a href=\"./relacoes/index.html\">Relações</a></h1>\n");
 	fprintf(index, "<img src=\"graph.jpeg\" alt=\"Smiley face\" style=\"display: block; margin-left: auto; margin-right: auto;\" width=\"70%%\">");
-	//printOptions();
-
+	
   	END_HTML(index);
   	fclose(index);
 }
