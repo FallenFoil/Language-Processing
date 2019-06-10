@@ -5,11 +5,17 @@
 #include <unistd.h> 
 #include <fcntl.h> 
 
+GList *options;
 GHashTable *conceitos; //contem toda a informação
 GHashTable *termsByRelation; //Chave = char* relação , value = List<List<char *>> termos da relacao
 							 //EXEMPLO Chave BT , value = {{animal, cao}, {animal, gato}, {ser vivo, anima}} Não é obrigatório ser de cumprimento 2
 
-
+typedef struct option
+{
+	char* name;
+	char* rel1;
+	char* rel2;
+} Option;
 typedef struct relation
 {
 	char *name;
@@ -23,6 +29,12 @@ typedef struct conceito
 
 } Conceito;
 
+
+
+void ERROR(char * message){
+	fprintf(stderr, "%s\n", message);
+	_exit(0);
+}
 
 /////////////////////////////// HTML ///////////////////////////////
 
@@ -114,11 +126,14 @@ void printRelations(){
 void createHTML(){
 	FILE* index = fopen("./html/index.html", "w");
 	BEGIN_HTML(index, "Index");
+
 	printConceitos();
 	fprintf(index, "<h1><a href=\"./conceitos/index.html\">Conceitos</a></h1>\n");
 	printRelations();
 	fprintf(index, "<h1><a href=\"./relacoes/index.html\">Relações</a></h1>\n");
 	fprintf(index, "<img src=\"graph.jpeg\" alt=\"Smiley face\" style=\"display: block; margin-left: auto; margin-right: auto;\" width=\"70%%\">");
+	//printOptions();
+
   	END_HTML(index);
   	fclose(index);
 }
@@ -165,6 +180,7 @@ void createDOT(){
 
 /////////////////////////////// DOT  ///////////////////////////////
 
+////////////////////////////// Struct //////////////////////////////
 void initConceitos(){
 	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
 }
@@ -173,9 +189,14 @@ void initRelations(){
 	termsByRelation = g_hash_table_new(g_str_hash, g_str_equal);
 } 
 
+void initOptions(){
+	options = NULL;
+}
+
 void init(){
 	initConceitos();
 	initRelations();
+	initOptions();
 }
 
 Conceito* getConceito(char* concName){
@@ -245,4 +266,35 @@ void printCon(void *key,void *value,void *data){
 
 	g_list_foreach(x->relations,printRel,NULL);
 	printf("\n");
+}
+
+// retorna null se não houver
+char* getInvis(char * rel){
+	for(int i = 0; i < g_list_length(options); i++){
+		Option * opt = g_list_nth_data(options, i);
+		if(strcmp(opt->name, "invis") == 0){
+			if(strcmp(rel, opt->rel1) == 0){
+				if(opt->rel2 == NULL) ERROR("Invis requires 2 arguments");
+				return opt->rel2;
+			}
+			if(strcmp(rel, opt->rel2) == 0){
+				if(opt->rel1 == NULL) ERROR("Invis requires 2 arguments");
+				return opt->rel1;
+			}
+		}
+	}
+	return NULL;			
+}
+
+Option* newOption(char* name, GList *relations){
+	Option* option = (Option *) malloc(sizeof(Option));
+	option->name = strdup(name);
+	option->rel1 = (char *) g_list_nth_data(relations, 0);
+	option->rel2 = (char *) g_list_nth_data(relations, 1);
+	return option;
+}
+
+void addOption(char *name, GList* relations){
+	Option* opt = newOption(name, relations);
+	options = g_list_append(options, opt);
 }
