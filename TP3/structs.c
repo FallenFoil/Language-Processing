@@ -58,7 +58,7 @@ void END_HTML(FILE* file){
 }
 
 void printTerm(void* term, void* file){
-	fprintf((FILE*)file, "<li>Term: %s</li>\n", (char*) term);
+	fprintf((FILE*)file, "<li>%s</li>\n", (char*) term);
 }
 
 void printRelation(void* relation ,void *file){
@@ -83,6 +83,9 @@ void printRelationByTerms(Relations *rel, void* file){
 
 void printConceito(Conceito *conceito, FILE *file){
 	fprintf(file, "<h1>Conceito: %s</h1>\n<h2>Relações:</h2>\n", conceito->name);
+	if(g_list_length(conceito->relations) == 0){
+		fprintf(file, "<li>(Sem relações)</li>");
+	}
 	g_list_foreach(conceito->relations, printRelation, file);
 }
 
