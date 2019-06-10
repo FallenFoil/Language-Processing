@@ -1,9 +1,0 @@
-digraph Conceitos {
-"animal"->"animal" [ label = "PT" ]
-"animal"->"cat" [ label = "NT" ]
-"animal"->"camel" [ label = "NT" ]
-"camel"->"animal" [ label = "BT" ]
-"camel"->"camelo" [ label = "PT" ]
-"cat"->"animal" [ label = "BT" ]
-"cat"->"gato" [ label = "PT" ]
-}
