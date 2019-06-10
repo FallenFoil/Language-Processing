@@ -10,6 +10,7 @@
  GList *relations = NULL;
  GList *rel4Opts = NULL;
  Conceito *c;
+ char *c1;
  Relations *r;
 %}
 
@@ -37,7 +38,9 @@ args: RELATION args  													{rel4Opts = g_list_append(rel4Opts, $1); aspri
 	;
 
 
-conceitos:  conceitos CONCEITO relations 								{ c = newConceito($2,relations);
+conceitos:  conceitos CONCEITO relations 								{
+																		 searchTerms($2,relations);
+																		 c = newConceito($2,relations);
 		 																 addConceito(c);
 																		 relations = NULL;
 			 															 asprintf(&$$,"%s%s\n%s\n" , $1 , $2 ,$3);}
@@ -54,9 +57,11 @@ relations: RELATION termos 												{ r = newRelation($1,terms);
 			 															 asprintf(&$$, "%s\n%s - %s", $1, $2 , $3);}
 		 ;	
 
-termos: TERMO ',' termos												{ terms = addTermsTo($1,terms);
+termos: TERMO ',' termos												{ c = newConceito($1,NULL); addConceito(c);
+																		 terms = addTermsTo($1,terms);
 																		 asprintf(&$$, "%s,%s", $1, $3);}
-	  | TERMO 															{ terms = addTermsTo($1,terms);
+	  | TERMO 															{ c = newConceito($1,NULL); addConceito(c);
+		  																 terms = addTermsTo($1,terms);
 		  																 $$ = $1;}
 	  ;
 
@@ -69,12 +74,17 @@ int main(){
         yydebug = 1;
     #endif
 	//conceitos -> contem toda a informacao do sistema
-	//para confirmar -> g_hash_table_foreach(conceitos,printConceito,NULL);
+	
 	init();
    	printf("Iniciar parse\n");
    	yyparse();
    	printf("Fim de parse\n");
-   	createHTML();
-   	createDOT();
+   	//createHTML();
+   	//createDOT();
+
+
+	printf("\n\n\n");
+	g_hash_table_foreach(conceitos,printCon,NULL);
+
    	return 0;
 }

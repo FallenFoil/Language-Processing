@@ -5,10 +5,19 @@
 #include <unistd.h> 
 #include <fcntl.h> 
 
+pthread_mutex_t mutex;
+int bool;
 GList *options;
 GHashTable *conceitos; //contem toda a informação
 GHashTable *termsByRelation; //Chave = char* relação , value = List<List<char *>> termos da relacao
 							 //EXEMPLO Chave BT , value = {{animal, cao}, {animal, gato}, {ser vivo, anima}} Não é obrigatório ser de cumprimento 2
+
+
+typedef struct tuplo
+{
+	char *conceito;
+	char *relacao;
+} Tuplo;
 
 typedef struct option
 {
@@ -16,6 +25,7 @@ typedef struct option
 	char* rel1;
 	char* rel2;
 } Option;
+
 typedef struct relation
 {
 	char *name;
@@ -28,7 +38,6 @@ typedef struct conceito
 	GList *relations;
 
 } Conceito;
-
 
 
 void ERROR(char * message){
@@ -219,20 +228,31 @@ Conceito* getConceito(char* concName){
 }
 
 Conceito* newConceito(char *name, GList *r){
-	Conceito *conceito = (Conceito *) malloc(sizeof(Conceito));
-	conceito->name = strdup(name);
-	conceito->relations = r;
-	return conceito;
+
+	Conceito *conceito = NULL;
+
+	//quando o conceito não existe
+	if((conceito=g_hash_table_lookup(conceitos,name))==NULL){
+		conceito = (Conceito *) malloc(sizeof(Conceito));
+		conceito->name = strdup(name);
+		conceito->relations = r;
+		return conceito;
+	//quando já existe
+	}else{
+		conceito->relations = g_list_concat(conceito->relations,r);
+		return conceito;
+	}
 }
 
 
 void addConceito(Conceito *c){
+	printf("ADICIONANDO %s\n",c->name);
 	if(!g_hash_table_contains(conceitos,c->name)){
 		g_hash_table_insert(conceitos, c->name, c);
 	}
 }
 
-Relations* newRelation(char* relName,GList *r){
+Relations* newRelation(char* relName, GList *r){
 	Relations *relations = (Relations *) malloc(sizeof(Relations));
 	relations->name = strdup(relName);
 	relations->terms = r;
@@ -300,6 +320,60 @@ char* getInvis(char * rel){
 	}
 	return NULL;			
 }
+
+//encontra no conceito2 um termo equivalente ao conceito1 e mete no cocneito1 a inversa da relação
+void putRelation(char *conceito1, char *conceito2 , char *relation, GHashTable *conceito){
+
+
+	Conceito *c1 = getConceito(conceito1);
+	Conceito *c2 = getConceito(conceito2);
+ 
+	if(c1==NULL) newConceito(conceito1,NULL);
+	if(c2==NULL) newConceito(conceito2,NULL);
+
+
+	//cria a relação para o conceito c1
+	GList *l1 = NULL;
+	l1 = g_list_append(l1,conceito2);
+	
+	Relations *r = newRelation(relation,l1);
+	//nova relação adicionada
+	c1->relations = g_list_append(c1->relations,r);
+	
+}
+
+void Terms(void *data, void* user_data){
+	//se algum termo já existir
+	char *termo = data;
+	Conceito *c ;
+	Tuplo *t = user_data;
+
+	//se já existir um conceito para este termo, que vai existir
+	if((c=g_hash_table_lookup(conceitos,termo))!=NULL){
+		//se os termos não forem iguais
+		if(strcmp(termo,t->conceito)!=0){
+			putRelation(termo,t->conceito,getInvis(t->relacao),conceitos);
+		}
+	}
+}
+
+void lookTerms(void* data,void* user_data){
+	Relations *r = data;
+	char *conceito = user_data;
+
+	Tuplo *t = malloc(sizeof(Tuplo));
+	t->conceito = strdup(conceito);
+	t->relacao = strdup(r->name);
+
+	g_list_foreach( r->terms, Terms, t );
+}
+
+void searchTerms(char *conceito,GList *relations){
+
+	g_list_foreach(relations,lookTerms,conceito);
+
+}
+
 
 Option* newOption(char* name, GList *relations){
 	Option* option = (Option *) malloc(sizeof(Option));

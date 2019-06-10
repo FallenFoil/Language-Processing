@@ -1,0 +1,4 @@
+digraph Conceitos {
+"animal"->"animal" [ label = "PT" ]
+"camel"->"camelo" [ label = "PT" ]
+}
