@@ -16,3 +16,4 @@ thesaurus: thesaurus.fl thesaurus.y
 clean:
 	rm -f y.tab.c lex.yy.c thesaurus_2788
 	rm -rf html
+	rm y.output
