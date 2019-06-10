@@ -5,13 +5,13 @@ Grammar
     1 thesaurus: options conceitos
 
     2 options: options OPT args
-    3        | /* empty */
+    3        | %empty
 
     4 args: RELATION args
     5     | RELATION
 
     6 conceitos: conceitos CONCEITO relations
-    7          | /* empty */
+    7          | %empty
 
     8 relations: RELATION termos
     9          | relations RELATION termos
@@ -49,7 +49,7 @@ termos (14)
     on left: 10 11, on right: 8 9 10
 
 
-state 0
+State 0
 
     0 $accept: . thesaurus $end
 
@@ -59,14 +59,14 @@ state 0
     options    go to state 2
 
 
-state 1
+State 1
 
     0 $accept: thesaurus . $end
 
     $end  shift, and go to state 3
 
 
-state 2
+State 2
 
     1 thesaurus: options . conceitos
     2 options: options . OPT args
@@ -78,14 +78,14 @@ state 2
     conceitos  go to state 5
 
 
-state 3
+State 3
 
     0 $accept: thesaurus $end .
 
     $default  accept
 
 
-state 4
+State 4
 
     2 options: options OPT . args
 
@@ -94,7 +94,7 @@ state 4
     args  go to state 7
 
 
-state 5
+State 5
 
     1 thesaurus: options conceitos .
     6 conceitos: conceitos . CONCEITO relations
@@ -104,7 +104,7 @@ state 5
     $default  reduce using rule 1 (thesaurus)
 
 
-state 6
+State 6
 
     4 args: RELATION . args
     5     | RELATION .
@@ -116,14 +116,14 @@ state 6
     args  go to state 9
 
 
-state 7
+State 7
 
     2 options: options OPT args .
 
     $default  reduce using rule 2 (options)
 
 
-state 8
+State 8
 
     6 conceitos: conceitos CONCEITO . relations
 
@@ -132,14 +132,14 @@ state 8
     relations  go to state 11
 
 
-state 9
+State 9
 
     4 args: RELATION args .
 
     $default  reduce using rule 4 (args)
 
 
-state 10
+State 10
 
     8 relations: RELATION . termos
 
@@ -148,7 +148,7 @@ state 10
     termos  go to state 13
 
 
-state 11
+State 11
 
     6 conceitos: conceitos CONCEITO relations .
     9 relations: relations . RELATION termos
@@ -158,7 +158,7 @@ state 11
     $default  reduce using rule 6 (conceitos)
 
 
-state 12
+State 12
 
    10 termos: TERMO . ',' termos
    11       | TERMO .
@@ -168,14 +168,14 @@ state 12
     $default  reduce using rule 11 (termos)
 
 
-state 13
+State 13
 
     8 relations: RELATION termos .
 
     $default  reduce using rule 8 (relations)
 
 
-state 14
+State 14
 
     9 relations: relations RELATION . termos
 
@@ -184,7 +184,7 @@ state 14
     termos  go to state 16
 
 
-state 15
+State 15
 
    10 termos: TERMO ',' . termos
 
@@ -193,14 +193,14 @@ state 15
     termos  go to state 17
 
 
-state 16
+State 16
 
     9 relations: relations RELATION termos .
 
     $default  reduce using rule 9 (relations)
 
 
-state 17
+State 17
 
    10 termos: TERMO ',' termos .
 

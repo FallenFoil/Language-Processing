@@ -352,7 +352,9 @@ void Terms(void *data, void* user_data){
 	if((c=g_hash_table_lookup(conceitos,termo))!=NULL){
 		//se os termos não forem iguais
 		if(strcmp(termo,t->conceito)!=0){
-			putRelation(termo,t->conceito,getInvis(t->relacao),conceitos);
+			char * inversa = getInvis(t->relacao);
+			if(inversa != NULL)
+				putRelation(termo,t->conceito,getInvis(t->relacao),conceitos);
 		}
 	}
 }
@@ -369,7 +371,6 @@ void lookTerms(void* data,void* user_data){
 }
 
 void searchTerms(char *conceito,GList *relations){
-
 	g_list_foreach(relations,lookTerms,conceito);
 
 }

@@ -79,8 +79,8 @@ int main(){
    	printf("Iniciar parse\n");
    	yyparse();
    	printf("Fim de parse\n");
-   	//createHTML();
-   	//createDOT();
+   	createHTML();
+   	createDOT();
 
 
 	printf("\n\n\n");

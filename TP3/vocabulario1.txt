@@ -4,13 +4,10 @@
 
 animal 
 PT animal
-NT camel, gato
+NT camel, cat
 
 camel
-PT camel
-BT animal
+PT camelo
 
-gato
+cat
 PT gato
-
-

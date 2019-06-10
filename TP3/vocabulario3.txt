@@ -4,26 +4,23 @@
 
 animal 
 PT animal
-NT cat, dog, cow 
-NT camel  #teste
+NT cat, dog, cow    #as relacoes BT sao automaticamente geradas
+NT camel
 BT Life being
 
 cat
-PT gato   
-BT animal   
+PT gato 
 SN animal que tem sete vidas e meia
 
 dog
 PT cao
-BT animal   
 SN animal leal ao homem
 
 cow
 PT vaca
-BT animal   
-SN animal que da leite xD
+SN animal que da leite
 
 rat
 PT rato
-BT animal   
+BT animal			#a relacao NT com animal é gerada também
 SN animal parecido ao Macedo

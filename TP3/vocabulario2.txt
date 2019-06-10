@@ -9,5 +9,4 @@ BT ser vivo
 
 gato
 EN cat
-BT animal
 SN animal with seven lifes
