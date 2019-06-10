@@ -1,0 +1,29 @@
+%language PT     
+%baselang EN
+%invis BT NT
+
+animal 
+PT animal
+NT cat, dog, cow 
+NT camel  #teste
+BT Life being
+
+cat
+PT gato   
+BT animal   
+SN animal que tem sete vidas e meia
+
+dog
+PT cao
+BT animal   
+SN animal leal ao homem
+
+cow
+PT vaca
+BT animal   
+SN animal que da leite xD
+
+rat
+PT rato
+BT animal   
+SN animal parecido ao Macedo

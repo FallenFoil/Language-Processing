@@ -3,7 +3,7 @@
 %invis BT NT
 
 animal 
-PT animal	
+PT animal
 NT cat, dog, cow 
 NT camel  #teste
 BT Life being

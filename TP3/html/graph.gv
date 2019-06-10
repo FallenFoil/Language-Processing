@@ -1,0 +1,11 @@
+digraph Conceitos {
+"animal"->"animal" [ label = "PT" ]
+"animal"->"cow" [ label = "NT" ]
+"animal"->"dog" [ label = "NT" ]
+"animal"->"cat" [ label = "NT" ]
+"animal"->"camel" [ label = "NT" ]
+"animal"->"Life being" [ label = "BT" ]
+"cat"->"gato" [ label = "PT" ]
+"cat"->"animal" [ label = "BT" ]
+"cat"->"animal que tem sete vidas e meia" [ label = "SN" ]
+}

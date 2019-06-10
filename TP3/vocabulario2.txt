@@ -1,0 +1,13 @@
+%language EN
+%baselang PT
+%invis BT NT
+
+animal
+EN animal 
+NT cao, gato, vaca, boi 
+BT ser vivo
+
+gato
+EN cat
+BT animal
+SN animal with seven lifes
