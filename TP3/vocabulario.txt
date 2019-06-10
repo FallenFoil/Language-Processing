@@ -2,10 +2,10 @@
 %baselang EN
 %invis BT NT
 
-animal 				
-PT animal			
-NT cat, dog, cow
-NT camel
+animal 
+PT animal	
+NT cat, dog, cow 
+NT camel  #teste
 BT Life being
 
 cat

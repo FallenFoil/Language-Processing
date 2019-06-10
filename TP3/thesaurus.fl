@@ -1,5 +1,5 @@
 %option noyywrap
-%x OPTIONS COMENTARIO CONCEITOS
+%x OPTIONS CONCEITOS
 %{
 #ifdef DEBUG_FL
 #define PRINT_DEBUG	printf("FLEX::%s\n",yytext);
@@ -10,23 +10,20 @@
 
 
 %%
-\% 														{BEGIN OPTIONS;}
-<*>\# 													{ BEGIN COMENTARIO;}
-[a-zA-Z]+												{ BEGIN CONCEITOS; yylval.string = strdup(yytext); return CONCEITO;}
-[ \t\n]	 												{}
+\% 														{PRINT_DEBUG; BEGIN OPTIONS;}
+<*>\#.* 												{PRINT_DEBUG;}
+[a-zA-Z]+												{PRINT_DEBUG; BEGIN CONCEITOS; yylval.string = strdup(yytext); return CONCEITO;}
+[ \t\n]	 												{PRINT_DEBUG; }
 
-<OPTIONS>[a-z]+											{ yylval.string = strdup(yytext); return OPT;}
-<OPTIONS>[A-Z]+											{ yylval.string = strdup(yytext); return RELATION;}
-<OPTIONS>\n 											{ BEGIN 0;}
+<OPTIONS>[a-z]+											{PRINT_DEBUG;  yylval.string = strdup(yytext); return OPT;}
+<OPTIONS>[A-Z]+											{PRINT_DEBUG;  yylval.string = strdup(yytext); return RELATION;}
+<OPTIONS>\n 											{PRINT_DEBUG;  BEGIN 0;}
 
-<COMENTARIO>.											{}
-<COMENTARIO>\n 											{ BEGIN 0;}
-
-<CONCEITOS>([A-Z]?[a-z]+[ ]*)*[A-Z]?[a-z]+				{ yylval.string = strdup(yytext); return TERMO;}
-<CONCEITOS>[A-Z]+										{ yylval.string = strdup(yytext); return RELATION;}
-<CONCEITOS>\n\n 										{ BEGIN 0;}
-<CONCEITOS>\n											{}
-<CONCEITOS>,											{ return yytext[0];}
-<CONCEITOS>[ ]											{}
-<*>. 													{}
+<CONCEITOS>([A-Z]?[a-z]+[ ]*)*[A-Z]?[a-z]+				{PRINT_DEBUG; yylval.string = strdup(yytext); return TERMO;}
+<CONCEITOS>[A-Z]+										{PRINT_DEBUG; yylval.string = strdup(yytext); return RELATION;}
+<CONCEITOS>\n\n 										{PRINT_DEBUG; BEGIN 0;}
+<CONCEITOS>\n											{PRINT_DEBUG; }
+<CONCEITOS>,											{PRINT_DEBUG; return yytext[0];}
+<CONCEITOS>[ ]											{PRINT_DEBUG; }
+<*>. 													{PRINT_DEBUG; }
 %%

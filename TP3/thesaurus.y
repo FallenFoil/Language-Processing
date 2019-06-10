@@ -74,5 +74,6 @@ int main(){
    	yyparse();
    	printf("Fim de parse\n");
    	createHTML();
+   	createDOT();
    	return 0;
 }

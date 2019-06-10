@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <glib.h>
+#include <unistd.h> 
+#include <fcntl.h> 
 
 GHashTable *conceitos; //contem toda a informação
 GHashTable *termsByRelation; //Chave = char* relação , value = List<List<char *>> termos da relacao
@@ -41,19 +43,21 @@ void printTerm(void* term, void* file){
 void printRelation(void* relation ,void *file){
 	Relations* rel = (Relations*) relation;
 	fprintf((FILE*)file, "<h4>Relação: %s</h4>\n", rel->name);
-	fprintf(file, "<ul>");
+	fprintf(file, "<ul>\n");
 	g_list_foreach(rel->terms, printTerm, file);
-	fprintf(file, "</ul>");
+	fprintf(file, "</ul>\n");
 }
 
 void printTermsOfRelation(void* terms, void* file){
-	g_list_foreach(terms, printTerm, file);
-	fprintf(file, "\n");
+	g_list_foreach((GList *)terms, printTerm, file);
+	fprintf(file, "<br/>\n");
 }
 
-void printRelationByTerms(void *terms, void* file){
-	GList * listTerms = (GList *) terms;
-	g_list_foreach(listTerms, printTermsOfRelation, file);
+void printRelationByTerms(Relations *rel, void* file){
+	fprintf(file, "<h1>%s</h1>\n", rel -> name);
+	fprintf(file, "<ul>\n");
+	g_list_foreach(rel->terms, printTermsOfRelation, file);
+	fprintf(file, "</ul>\n");
 }
 
 void printConceito(Conceito *conceito, FILE *file){
@@ -97,7 +101,7 @@ void printRelations(){
 		strcat(filePath, ".html");
 		FILE * file = fopen(filePath, "w");
 		BEGIN_HTML(file, key);
-		printTermsOfRelation((Conceito *) value, file);
+		printRelationByTerms((Relations *) value, file);
 		fprintf(index, "<h1><a href=\"./%s.html\">%s</a></h1>\n", (char*)key, (char*)key);
 		END_HTML(file);
 		fclose(file);
@@ -114,11 +118,52 @@ void createHTML(){
 	fprintf(index, "<h1><a href=\"./conceitos/index.html\">Conceitos</a></h1>\n");
 	printRelations();
 	fprintf(index, "<h1><a href=\"./relacoes/index.html\">Relações</a></h1>\n");
+	fprintf(index, "<img src=\"graph.jpeg\" alt=\"Smiley face\" style=\"display: block; margin-left: auto; margin-right: auto;\" width=\"70%%\">");
   	END_HTML(index);
   	fclose(index);
 }
 
 /////////////////////////////// HTML ///////////////////////////////
+
+/////////////////////////////// DOT  ///////////////////////////////
+FILE* dot;
+
+void printRelations_DOT(void* term, void* dados){
+	char** conceitoERelacao = (char**) dados;
+	fprintf(dot, "\"%s\"->\"%s\" [ label = \"%s\" ]\n", conceitoERelacao[0], (char*) term, conceitoERelacao[1]);
+}
+
+void printConceito_DOT(void* relation, void* father){
+	Relations * rel = (Relations *) relation;
+	char* conceito = (char *) father;
+	char* conceitoERelacao[2];
+	conceitoERelacao[0] = conceito;
+	conceitoERelacao[1] = rel->name;
+	g_list_foreach(rel->terms, printRelations_DOT, conceitoERelacao);
+}
+
+void createDOT(){
+	char* dotFilePath = "./html/graph.gv";
+	dot = fopen( dotFilePath , "w");
+
+	fprintf(dot, "digraph Conceitos {\n");
+	GHashTableIter iter;
+	gpointer key, value;
+	g_hash_table_iter_init (&iter, conceitos);
+	while (g_hash_table_iter_next (&iter, &key, &value)){
+		Conceito * conceito = (Conceito *) value;
+		g_list_foreach(conceito->relations,printConceito_DOT, conceito->name);
+	}
+	fprintf(dot, "}");
+	fclose(dot);
+
+    char *cmd = "dot";
+	char *argv[] = {"dot", "-Tjpeg", "-o", "./html/graph.jpeg", "./html/graph.gv", NULL };
+	execvp(cmd, argv);
+}
+
+
+/////////////////////////////// DOT  ///////////////////////////////
 
 void initConceitos(){
 	conceitos = g_hash_table_new(g_str_hash, g_str_equal);
