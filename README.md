@@ -1,6 +1,6 @@
 #  Language-Processing
 
-Three Exercises using 3 tools for language processing.
+Three Exercises using three tools for language processing.
 
 ## Tools
 
